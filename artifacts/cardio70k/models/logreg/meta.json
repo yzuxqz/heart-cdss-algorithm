@@ -1,0 +1,26 @@
+{
+  "dataset": "cardio70k",
+  "csv_path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\cardio_train.csv",
+  "target": "cardio",
+  "run_id": "20260331_194240",
+  "model": "logreg",
+  "best_params": {
+    "C": 2
+  },
+  "row": {
+    "run_id": "20260331_194240",
+    "dataset": "cardio70k",
+    "model": "logreg",
+    "cv_roc_auc": 0.7837322631082699,
+    "test_accuracy": 0.7135,
+    "test_precision": 0.7315030246626338,
+    "test_recall": 0.6740994854202401,
+    "test_f1": 0.701629100647177,
+    "test_roc_auc": 0.7787737338853009,
+    "test_pr_auc": 0.7570214010848371,
+    "n_train": 56000,
+    "n_test": 14000,
+    "cv_folds": 2,
+    "n_iter": 2
+  }
+}

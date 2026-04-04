@@ -1,0 +1,27 @@
+{
+  "dataset": "uci_cleveland",
+  "csv_path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\heart_disease_uci.csv",
+  "target": "num",
+  "run_id": "20260331_195712",
+  "model": "logreg",
+  "best_params": {
+    "C": 0.05
+  },
+  "row": {
+    "run_id": "20260331_195712",
+    "dataset": "uci_cleveland",
+    "model": "logreg",
+    "cv_roc_auc": 0.8979206783554611,
+    "test_accuracy": 0.8852459016393442,
+    "test_precision": 0.8387096774193549,
+    "test_recall": 0.9285714285714286,
+    "test_f1": 0.8813559322033898,
+    "test_roc_auc": 0.9632034632034632,
+    "test_pr_auc": 0.9473765696338792,
+    "n_train": 243,
+    "n_test": 61,
+    "cv_folds": 5,
+    "n_iter": 20,
+    "shap": true
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "dataset": "uci_cleveland",
+  "csv_path": "C:\\Users\\13363\\Desktop\\ukm\\p1\\heart_disease_uci.csv",
+  "target": "num",
+  "model": "rf",
+  "best_params": {
+    "model__n_estimators": 300,
+    "model__min_samples_split": 10,
+    "model__min_samples_leaf": 2,
+    "model__max_features": "log2",
+    "model__max_depth": null
+  },
+  "cv_best_score_roc_auc": 0.8978632478632479,
+  "test_metrics": {
+    "accuracy": 0.9016393442622951,
+    "precision": 0.8666666666666667,
+    "recall": 0.9285714285714286,
+    "f1": 0.896551724137931,
+    "roc_auc": 0.9545454545454546,
+    "pr_auc": 0.9378618422411524,
+    "confusion_matrix": [
+      [
+        29,
+        4
+      ],
+      [
+        2,
+        26
+      ]
+    ]
+  },
+  "n_train": 243,
+  "n_test": 61,
+  "run_id": "20260331_172322"
+}

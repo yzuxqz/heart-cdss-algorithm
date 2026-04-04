@@ -1,0 +1,104 @@
+{
+  "columns": [
+    {
+      "name": "male",
+      "type": "categorical",
+      "categories": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "age",
+      "type": "numeric",
+      "min": 32.0,
+      "max": 70.0
+    },
+    {
+      "name": "education",
+      "type": "numeric",
+      "min": 1.0,
+      "max": 4.0
+    },
+    {
+      "name": "currentSmoker",
+      "type": "categorical",
+      "categories": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "cigsPerDay",
+      "type": "numeric",
+      "min": 0.0,
+      "max": 70.0
+    },
+    {
+      "name": "BPMeds",
+      "type": "numeric",
+      "min": 0.0,
+      "max": 1.0
+    },
+    {
+      "name": "prevalentStroke",
+      "type": "categorical",
+      "categories": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "prevalentHyp",
+      "type": "categorical",
+      "categories": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "diabetes",
+      "type": "categorical",
+      "categories": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "totChol",
+      "type": "numeric",
+      "min": 107.0,
+      "max": 696.0
+    },
+    {
+      "name": "sysBP",
+      "type": "numeric",
+      "min": 83.5,
+      "max": 295.0
+    },
+    {
+      "name": "diaBP",
+      "type": "numeric",
+      "min": 48.0,
+      "max": 142.5
+    },
+    {
+      "name": "BMI",
+      "type": "numeric",
+      "min": 15.54,
+      "max": 56.8
+    },
+    {
+      "name": "heartRate",
+      "type": "numeric",
+      "min": 44.0,
+      "max": 143.0
+    },
+    {
+      "name": "glucose",
+      "type": "numeric",
+      "min": 40.0,
+      "max": 394.0
+    }
+  ]
+}

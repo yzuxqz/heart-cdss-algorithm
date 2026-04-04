@@ -1,0 +1,33 @@
+{
+  "dataset": "uci_cleveland",
+  "csv_path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\heart_disease_uci.csv",
+  "target": "num",
+  "run_id": "20260331_195712",
+  "model": "xgb",
+  "best_params": {
+    "subsample": 0.85,
+    "reg_lambda": 2.0,
+    "n_estimators": 300,
+    "min_child_weight": 10,
+    "max_depth": 4,
+    "learning_rate": 0.03,
+    "colsample_bytree": 0.7
+  },
+  "row": {
+    "run_id": "20260331_195712",
+    "dataset": "uci_cleveland",
+    "model": "xgb",
+    "cv_roc_auc": 0.9016539418713332,
+    "test_accuracy": 0.8852459016393442,
+    "test_precision": 0.8620689655172413,
+    "test_recall": 0.8928571428571429,
+    "test_f1": 0.8771929824561403,
+    "test_roc_auc": 0.9653679653679654,
+    "test_pr_auc": 0.9626405680894384,
+    "n_train": 243,
+    "n_test": 61,
+    "cv_folds": 5,
+    "n_iter": 20,
+    "shap": true
+  }
+}

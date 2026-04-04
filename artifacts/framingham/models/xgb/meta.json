@@ -1,0 +1,32 @@
+{
+  "dataset": "framingham",
+  "csv_path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\framingham.csv",
+  "target": "TenYearCHD",
+  "run_id": "20260331_173648",
+  "model": "xgb",
+  "best_params": {
+    "subsample": 0.7,
+    "reg_lambda": 1.0,
+    "n_estimators": 900,
+    "min_child_weight": 1,
+    "max_depth": 3,
+    "learning_rate": 0.01,
+    "colsample_bytree": 0.7
+  },
+  "row": {
+    "run_id": "20260331_173648",
+    "dataset": "framingham",
+    "model": "xgb",
+    "cv_roc_auc": 0.7203838586370246,
+    "test_accuracy": 0.8455188679245284,
+    "test_precision": 0.45,
+    "test_recall": 0.0697674418604651,
+    "test_f1": 0.1208053691275167,
+    "test_roc_auc": 0.6686720358810146,
+    "test_pr_auc": 0.2746995950154287,
+    "n_train": 3392,
+    "n_test": 848,
+    "cv_folds": 5,
+    "n_iter": 25
+  }
+}

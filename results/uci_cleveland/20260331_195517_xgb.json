@@ -1,0 +1,45 @@
+{
+  "dataset": "uci_cleveland",
+  "csv_path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\heart_disease_uci.csv",
+  "target": "num",
+  "model": "xgb",
+  "best_params": {
+    "model__subsample": 0.85,
+    "model__reg_lambda": 2.0,
+    "model__n_estimators": 900,
+    "model__min_child_weight": 10,
+    "model__max_depth": 6,
+    "model__learning_rate": 0.01,
+    "model__colsample_bytree": 0.85
+  },
+  "cv_best_score_roc_auc": 0.8498069165682802,
+  "test_metrics": {
+    "accuracy": 0.8688524590163934,
+    "precision": 0.8333333333333334,
+    "recall": 0.8928571428571429,
+    "f1": 0.8620689655172413,
+    "roc_auc": 0.9664502164502164,
+    "pr_auc": 0.9638615693104396,
+    "confusion_matrix": [
+      [
+        28,
+        5
+      ],
+      [
+        3,
+        25
+      ]
+    ]
+  },
+  "n_train": 243,
+  "n_test": 61,
+  "cv_folds": 2,
+  "n_iter": 2,
+  "shap": true,
+  "shap_paths": {
+    "beeswarm": "C:\\Users\\13363\\Desktop\\code\\algorithm\\results\\uci_cleveland\\20260331_195517_xgb_shap_beeswarm.png",
+    "bar": "C:\\Users\\13363\\Desktop\\code\\algorithm\\results\\uci_cleveland\\20260331_195517_xgb_shap_bar.png",
+    "waterfall": "C:\\Users\\13363\\Desktop\\code\\algorithm\\results\\uci_cleveland\\20260331_195517_xgb_shap_waterfall_0.png"
+  },
+  "run_id": "20260331_195517"
+}

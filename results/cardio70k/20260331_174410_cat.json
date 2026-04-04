@@ -1,0 +1,36 @@
+{
+  "dataset": "cardio70k",
+  "csv_path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\cardio_train.csv",
+  "target": "cardio",
+  "model": "cat",
+  "best_params": {
+    "model__learning_rate": 0.01,
+    "model__l2_leaf_reg": 1,
+    "model__iterations": 1500,
+    "model__depth": 6
+  },
+  "cv_best_score_roc_auc": 0.8038556465639483,
+  "test_metrics": {
+    "accuracy": 0.7334285714285714,
+    "precision": 0.7503835532371893,
+    "recall": 0.6991137793024585,
+    "f1": 0.7238419416900992,
+    "roc_auc": 0.8004849654644786,
+    "pr_auc": 0.7847136115774274,
+    "confusion_matrix": [
+      [
+        5377,
+        1627
+      ],
+      [
+        2105,
+        4891
+      ]
+    ]
+  },
+  "n_train": 56000,
+  "n_test": 14000,
+  "cv_folds": 3,
+  "n_iter": 8,
+  "run_id": "20260331_174410"
+}

@@ -1,0 +1,658 @@
+﻿Xu qianzhou
+XU QIANZHOU
+Thesis Submitted in Fulfilment FOR the degree ofMASTER OF COMPUTER SCIENCE
+Facultyof information science and TechnologyUNIVERSITI KEBANGSAAN MALAYSIABANGI
+Xu qianzhou
+Tesis yang dikemukakan untuk memperolehIJAZAH SARJANA SAINS KOMPUTER
+Fakulti teknologi dan Sains maklumatUNIVERSITI KEBANGSAAN MALAYSIABANGI
+ABSTRACT 
+Cardiovascular diseases (CVDs) remain the leading cause of global morbidity and mortality, responsible for approximately 19.9 million deaths annually, necessitating more effective early detection strategies beyond traditional clinical methods. Despite the potential of Artificial Intelligence (AI) in healthcare, its adoption is hindered by the black box dilemma where complex algorithms lack transparency, and by a deployment gap where models remain theoretical rather than practical tools. This study aims to bridge these gaps by developing an interpretable, web-based Clinical Decision Support System (CDSS) for heart disease prediction. The research employs a quantitative experimental design using the Cleveland Heart Disease dataset (N=303) to evaluate three algorithms: Logistic Regression (baseline), Random Forest, and XGBoost. The comparative analysis focuses on standard performance metrics, including Accuracy, Precision, Recall, F1-Score and AUC-ROC, to determine the optimal model for early disease detection. The methodology involves rigorous data preprocessing, hyperparameter optimization via Grid Search with 5-Fold Cross-Validation, and the integration of SHAP to provide both local and global model interpretability. Furthermore, the study assesses the proposed Streamlit-based prototype'sutility through a usability survey using the System Usability Scale (SUS) and a specific interpretability evaluation. It is expected that ensemble learning models will outperform traditional baselines in predictive metrics such as F1-Score and AUC-ROC. Crucially, the integration of SHAP visualizations is anticipated to demystify algorithmic decisions for clinicians, achieving a satisfactory usability score (>68) and fostering clinical trust, thereby providing a robust, transparent, and accessible tool for early diagnosis.
+PENYELESAIAN KPI TEKNIK PEMBELAJARAN BERKUMPULAN UNTUK DETEKSIN AWAL PENYAKIT JANTUNG: DARI ALGORITMA KE PENGEMBANGAN
+ABSTRAK
+Penyakit kardiovaskular (PKV) masih menjadi penyebab utama kesakitan dan kematian global, menyebabkan kira-kira 19.9 juta kematian setiap tahun, sehingga memerlukan strategi deteksi dini yang lebih efektif di luar kaedah klinikal tradisional. Walaupun keupayaan Kecerdasan Buatan (AI) dalam perubatan, penerimaannya terhambat oleh paradoks kotak hitam di mana algoritma kompleks kurang transparan, dan jurang pelaksanaan di mana model masih teori bukan alat praktikal. Kajian ini bertujuan membangun sistem sokongan keputusan klinikal (CDSS) berbasis web yang boleh diinterpretasi untuk meramal penyakit jantung. Kajian ini menggunakan desain eksperimen kuantitatif dengan dataset Cleveland Heart Disease (N=303) untuk mengevaluasi tiga algoritma: Regresi Logistik (baseline), Random Forest, dan XGBoost. Analisis perbandingan berfokus pada kriteria kinerja standard termasuk Akurasi, Presisi, Recall, F1-Score dan AUC-ROC untuk menentukan model terbaik untuk deteksi dini penyakit. Kaedahnya melibatkan pemprosesan data yang ketat, pengoptimalan hiperekspresi melalui Grid Search dengan 5-Fold Cross-Validation, dan integrasi SHAP untuk memberikan interpretasi model kedudukan dan global. Selain itu, kajian ini menilai kegunaan prototaip berbasis Streamlit melalui kajian kelayakan menggunakan Skala Kelayakan Sistem (SUS) dan penilaian interpretabiliti khusus. Diharapkan model pembelajaran ensemble akan menunjukkan prestasi lebih baik daripada baseline tradisional dalam metrik ramalan seperti F1-Score dan AUC-ROC. Yang penting, integrasi visualisasi SHAP dijangka dapat menjelaskan keputusan algoritma kepada pakar perubatan, mencapai skor kelayakan yang memuaskan (>68) dan membangun kepercayaan klinikal, sehingga menyediakan alat yang kukuh, transparan, dan mudah diakses untuk diagnosis awal.
+
+
+TABLE OF CONTENTS
+Page
+TABLE OF CONTENTSiii
+LIST OF TABLESvii
+LIST OF ILLUSTRATIONSviii
+CHAPTER I    Introduction
+1.1 Research Background1
+1.1.1 Global Burden of Heart Disease1
+1.1.2 The Gap between Algorithm and Application2
+1.2 Problem Statement2
+1.2.1 The Limitation of Linear Models3
+1.2.2 The Black BoxDilemma4
+1.2.3 The Last Mile Gap5
+1.3 Research Questions5
+1.4 Research Objectives5
+1.5 Research Scope6
+1.6 Significance of Study7
+1.6.1 Theoretical Significance7
+1.6.2 Practical Significance7
+1.7 Thesis outline8
+CHAPTER II    Literature Review
+2.1 Introduction10
+2.2 Theoretical Background10
+2.2.1 The Global Burden of Heart Disease10
+2.2.2 The Shift from Statistics to Machine Learning11
+2.3 Theoretical Framework of Algorithms12
+2.3.1 Logistic Regression12
+2.3.2 Random Forest13
+2.3.3 XGBoost16
+2.3.4 Summary of Algorithmic Selection18
+2.4 Explainable AI19
+2.4.1 The Black-Box Problem in Healthcare19
+2.4.2 SHAP20
+2.5 Related Works on Heart Disease Prediction21
+2.5.1 Machine Learning on UCI Dataset21
+2.5.2 Limitations of Existing Studies25
+CHAPTER III    Methodology
+3.1 Introduction26
+3.2 Research Design26
+3.2.1 Modal Development and Performance Evaluation26
+3.2.2 Prototype Development and Quantitative User Validation27
+3.3 Research Framework27
+3.4 Data Acquisition and Description29
+3.4.1 Data Source29
+3.4.2 Dataset Description29
+3.5 Data Preprocessing30
+3.5.1 Handling Missing Values30
+3.5.2 Categorical Data Encoding30
+3.5.3 Feature Scaling32
+3.5.4 Data Splitting32
+3.6 Machine Learning Algorithms33
+3.6.1 Logistic Regression33
+3.6.2 Random Forest Classifier33
+3.6.3 XGBoost34
+3.6.4 Hyperparameter Tuning (Model Optimization)34
+3.7 System Development36
+3.7.1 Development Framework: Streamlit36
+3.7.2 System Architecture The application workflow37
+3.8 Model Interpretability37
+3.8.1 SHAP Framework37
+3.9 Usability and Interpretability Evaluation38
+3.9.1 Participants and Sampling Strategy38
+3.9.2 Evaluation Procedure38
+3.9.3 The Survey Instrument39
+3.9.4 Data Analysis Plan39
+3.10 Summary40
+References41
+
+LIST OF TABLES
+Table No.Page
+Table 2.1 Configuration of Hyperparameters for Grid Search18
+Table 2.2 Comparative Analysis of Recent Studies on Heart Disease Prediction (2020–2024)24
+Table 3.1 Description of Attributes in the Cleveland Heart Disease Dataset29
+Table 3.2 Application of One-Hot Encoding on Categorical Variables31
+Table 3.3 Numerical Features Selected for Standardization32
+Table 3.4 Configuration of Hyperparameters for Grid Search36
+
+LIST OF ILLUSTRATIONS
+Figure No.Page
+Figure 1.1 Comparison of decision boundaries between two classification models4
+Figure 2.1 The Logistic (Sigmoid) Function13
+Figure 2.2 The architecture of the Random Forest algorithm.15
+Figure 2.3 The XGBoost Architecture17
+Figure 3.1 The Operational Framework of the Study28
+
+Introduction
+Introduction
+Research Background
+Global Burden of Heart Disease
+Over the years, cardiovascular diseases have become the main cause of global morbidity and mortality. According to the latest 2025 report on heart disease and stroke statistics, cardiovascular disease causes approximately 19.9 million deaths worldwide each year (Martin et al., 2025). The main causes of heart disease are heart attacks and strokes. Despite advances in medical technology (World Heart Federation, 2025), the number of heart diseases is still increasing. Therefore, we need more effective prevention strategies. So, early detection and intervention are crucial because they can detect patients in the latent period as early as possible, and then encourage them to change their lifestyle and medical care in the early stages, thereby reducing mortality rates and potentially saving millions of lives.
+The growth of artificial intelligence has changed the way healthcare operates. In the past, medical services primarily focused on the number of visits, but now, by using AI, medical services are focused on results and individual care, gradually shifting towards exact treatment (Moor et al., 2023). Especially, medical decision tools (CDSS), which are based on artificial intelligence, have changed the previous diagnosis style by quickly reading complicated body information (Thirunavukarasuet al., 2023). Machine learning tools are different from older mathematical methods, because they can find hidden connections in large data groups and spot small details that humans cannot see (Rajpurkar & Lungren, 2023).By acting as intelligent second opinions, these systems enhance clinical judgment, thereby reducing diagnostic errors and enabling early intervention in critical situations.
+The Gap between Algorithm and Application
+Although the prediction accuracy of machine learning algorithms in cardiovascular medicine has shown rapid improvement in recent studies, a conflict still exists: the 'artificial intelligence gap' between research environments and real-world application. Despite releasing thousands of diagnostic models annually, few have been successfully used in daily medical practice or electronic health record (EHR) systems due to many technological and cultural challenges(Rajpurkar & Lungren, 2023).
+Most current models are still at the stage of 'theory testing'. They are usually trained and tested on clean historical data in a simple lab setting, which is very different from the messy, broken, and changing data found in real hospitals. As a result, models that reach 99% accuracy in the paper may fail when dealing with the problems of real patient data.
+Also, the move from 'code' to 'tools' is clearly lacking. Powerful models such as Random Forest and XGBoost are often made by computer scientists who focus on math scores rather than ease of use. For busy doctors, a basic Python script or command-line interface is of no help. They need clear, web-based tools that can be used without stopping the patient visit.
+Due to the black box problem of modern algorithms, this problem has become even more difficult to solve (Arun et al., 2021). Although these models can provide better results compared to old methods, it is still unclear how they operate internally. They are unable to explain how the results were obtained, making it almost impossible for doctors to understand whether the results were caused by factors (Moor et al., 2023). In a dangerous medical environment, a small wrong decision can lead to the death of a patient, so doctors cannot fully trust algorithms, which is also not allowed by law. The uncertainty and unfriendly design of algorithms make clinical doctors still refuse to use artificial intelligence even with high accuracy (Durán & Jongsma, 2021).
+Problem Statement
+Despite the rapid development of medical informatics, in order for artificial intelligence to be effectively applied in clinical settings, we must address three fundamental issues.
+The Limitation of Linear Models
+Firstly, the preferred algorithm for predicting heart disease has always been the traditional logistic regression method. Because logistic regression is linear, it assumes a direct connection between risk factors and disease outcomes. However, human data and diseases are not linearly correlated.
+Health data shows various connections in real medical situations. For example, high cholesterol does not necessarily mean that someone has a certain disease; When mixed with other factors such as age, smoking history, and blood pressure, its meaning may change. Linear models may consider "age>60 years old" and "hypertension" as different risks, and when both exist simultaneously, the probability of a patient suffering from a certain disease is actually high, but linear models may not be able to detect them.
+The result of this limitation is underfitting. Because older models fail to handle these hard non-linear links, they often miss hidden signs in complex data. This causes poor detection, leading to a higher rate of missed diagnoses (false negatives). In the case of heart disease, false negatives mean telling sick patients that they are healthy—a serious error that can lead to lost chances for quick help and deaths that could be avoided(Quer et al., 2021).
+The following figure compares (a) a linear classifier with (b) an ensemble based nonlinear classifier. Although logistic regression cannot capture the curvature of data distribution, random forest models can adapt to complex structures and provide more accurate classification. The data points represent clinical biomarkers, which are distinguished by shape and color for easy acquisition.
+
+Figure 1.1Comparison of decision boundaries between two classification models
+The Black BoxDilemma
+Secondly, although the use of powerful ensemble methods such as Random Forest and XGBoost has solved the accuracy limits of linear models, it has created a new and harder problem: the 'black box' issue.
+Older logistic regression is clear; the numbers it gives show doctors: 'Because of obesity, the patient's risk is 1.5 times higher.' On the other hand, ensemble models work by combining votes from hundreds or thousands of decision trees. Although this complex structure leads to better results, it makes the way it decides unclear and impossible for humans to understand.
+The outcome is a loss of trust. Medical staff work under strict rules, and they must show that their decisions make sense. Doctors cannot simply tell patients, 'You need surgery because the computer says so,' without understanding the real medical reasons. When a system is not clear—meaning it cannot explain why a certain patient is marked as high-risk—doctors refuse to use it. This trust gap leads people to overlook the benefits of a good algorithm in real life (Ghassemi et al., 2021).
+The Last Mile Gap
+Thirdly, there is a significant gap between algorithm research and practical clinical applications, which is commonly referred to as the last mile problem. In current research, most papers only focus on achieving high test scores, such as accuracy, AUC-ROC, and F1 scores, but they overlook the usability of user experience (UX) systems and the interpretability of AI algorithms.
+Many modern models are just basic Python scripts and need coding skills to run. However, the real users—doctors and students—are not computer experts working in stressful, busy places. They lack the time or ability to deal with text screens or raw code.
+The result is limited use. Without easy, web-based screens (GUI) for showing inputs and results instantly, complex machine learning models are just lab projects. They are of no help in clinics, greatly reducing the real worth of artificial intelligence in actual healthcare (Rajpurkar & Lungren, 2023).
+Research Questions
+This research aims to answer two main questions.
+How does the performance (accuracy, precision, recall, F1 score, AUC-ROC) of ensemble learning techniques (Random Forest, XGBoost) compared to logistic regression in early heart disease detection?
+What is the System Usability Scale (SUS) score of the Streamlit-based prototype, and how do participants with medical backgrounds rate the clarity and trustworthiness of the SHAP-based explanations?
+Research Objectives
+Based on the research problems identified above, the primary objectives of this study are defined as follows.
+To evaluate the performance of Random Forest and XGBoost against Logistic Regression using the Cleveland dataset.
+To develop a web-based diagnostic prototype using Streamlit to demonstrate model deployment.
+To evaluate the system's usability by using the standard System Usability Scale (SUS) and assess the interpretability of SHAP visualizations through a structured Likertscale survey.
+Research Scope
+The study uses the Cleveland heart disease data set (N = 303) from UCI's machine learning repository. The study focused on analyzing 14 standard clinical attributes (e.g., age, gender, type of chest pain, cholesterol) and did not include primary data collection from living patients or hospitals.
+The comparative analysis is limited to three specific supervised machine learning algorithms: Logistic Regression (as the baseline), Random Forest, and XGBoost. Other algorithms, such as Deep Learning (Neural Networks) or SVM, are excluded from this study, because for mid-sized tabular data, tree-based ensemble methods typically outperform Deep Learning models while requiring less computational resource (Grinsztajn et al., 2022).
+This product is a web prototype specifically developed using the Python Streamlit framework. The system is designed as an independent clinical decision support system (CDSS) for demonstration purposes, without integration with existing hospital information systems or mobile application development.
+The evaluation of the model is twofold. Firstly, evaluate objective performance using standard quantitative indicators: accuracy, recall rate, F1 score, and AUC-ROC. Secondly, a human centered evaluation was conducted through a structured questionnaire involving a sample of medical professionals or students (N=30). It is crucial that this survey combines the System Usability Scale (SUS) to measure overall system availability, as well as specific Likert scale items to quantify perceived trust and interpretability based on SHAP explanations.
+Significance of Study
+This research has significant implications for both the academic understanding of machine learning in healthcare and its practical application in clinical settings. The contributions are categorized into theoretical and practical dimensions.
+Theoretical Significance
+The main theoretical contribution of this study is to validate the effectiveness of ensemble learning algorithms in the context of scarce medical data. Although contemporary research often prioritizes deep learning methods, this approach requires large datasets, and the sample size is often limited in clinical settings. This study rigorously tested the random forest and XGBoost algorithms on a smaller dataset. Indicating that high-precision prediction can be achieved without the need for big data.
+This study investigates a key question: Is the additional complexity of machine learning worth it compared to standard logistic regression? The research results indicate that heart disease data involves complex relationships between factors such as age, cholesterol, and heart rate, which are often overlooked by simple linear models. However, tree based models such as random forests perform well in discovering these hidden patterns. By accurately measuring the performance of these models, this study demonstrates why it is necessary to shift from traditional statistical methods to advanced machine learning for early disease detection.
+Practical Significance
+Unlike many studies that are still in the code stage, this study provides a usable web prototype. This study demonstrates the successful integration of web frameworks, which is a practical reference for developers who wish to transform complex code into accessible and user-friendly clinical decision support systems (CDSS).
+This study enhances clinical trust through interpretable artificial intelligence, and a key practical contribution is the integration of SHAP to address the problem of doctors distrusting models due to their black box nature (Lundberg&Lee, 2017; Loh et al., 2022). Through visualization, the system displays which factors in the machine learning algorithm led to the  results (for example, emphasizing that high cholesterol increases the risk of specific patients by 20%). This enables healthcare professionals to validate the accuracy of artificial intelligence recommendations based on their clinical judgments, thereby promoting trust and collaboration between experts and automated diagnostic systems (Antoniadi et al., 2021).
+Thesis outline
+This dissertation is structured into five chapters, organizing the research from theoretical foundations to practical implementation and evaluation. The content of each chapter is outlined as follows:
+Chapter 1: Introduction. This chapter provides an overview of the research context. It outlines the background of cardiovascular disease diagnosis, identifies the problem of "black-box" models in clinical settings, and defines the research objectives, scope, and significance. It establishes the rationale for integrating Ensemble Learning with web-based deployment.
+Chapter 2: Literature Review. This chapter is primarily a detailed check of research related to computer intelligence in the medical field. This study uses standard prediction methods: Logistic Regression. This study utilizes standard prediction methods, such as Logistic Regression, as a starting point, while comparing them against complex, modern algorithms: Random Forest and XGBoost, to highlight their differences. At the same time, weaknesses in current work are pointed out, including the difficulty in explaining results and the lack of a complete system for real-world use.
+Chapter 3: Methodology. This chapter mainly introduces the algorithm technology studied and the code framework for building web applications. This chapter explains how to preprocess the Cleveland Heart Disease dataset and provides a hyperparameter tuning scheme, ultimately explained using SHAP. In addition, this chapter also describes the process of developing streamlit prototypes and designs a plan for usability and interpretability surveys.
+Chapter 4: Results and Discussion, mainly introducing the experimental results. It obtained quantitative performance indicators such as accuracy, precision, recall, F1 score, AUC-ROC. To verify the superiority of the integrated method over the baseline. A corresponding prototype system has also been developed to introduce how to use SHAP for AI interpretability, and to evaluate the results of quantitative survey questionnaires for personnel in related fields.
+Chapter 5: Conclusion The final chapter summarizes the main research findings related to the preliminary objectives. It discusses the limitations of the study, such as data limitations, and provides recommendations for future enhancements, including potential integration with real-time hospital information systems.
+
+
+
+
+
+
+
+
+
+
+Literature Review
+Literature Review
+Introduction
+This chapter comprehensively reviews the relevant theoretical foundations and empirical research. Section 2.2 provides an overview of the epidemiological background of cardiovascular disease and introduces the transition from traditional modeling to machine learning. Section 2.3 provides a detailed description of the mathematical mechanisms and evolutionary processes of three algorithms, namely logistic regression, random forest, and XGBoost. Section 2.4 introduces the black box problem in the medical field and elaborates on the theoretical basis of explainable artificial intelligence. The final section 2.5 critically evaluates the current research progress on the Cleveland Heart Disease Dataset to identify the key research gaps that this study aims to address, with a focus on model deployment and interpretability.
+Theoretical Background
+This section first examines the global epidemiology related to cardiovascular disease, and then analyzes the transition from traditional modeling to machine learning methods, which lays a theoretical foundation for subsequent research.
+The Global Burden of Heart Disease
+In the 21st century, cardiovascular disease remains a major public health issue. According to the 2025 Statistical Report on Heart Disease and Stroke, cardiovascular disease causes approximately 19.9 million deaths worldwide each year, which exceeds the total number of cancer deaths (Martin et al., 2025). Although great progress has been made in medical technology, the number of obese people and diabetes people are also increasing, and the increase of these health risks has led to the increase of the total number of heart cases (World Heart Federation, 2025).
+This continuing crisis shows a key problem in current healthcare models: they often wait for problems rather than preventing them. Traditional diagnosis mostly depends on seeing serious symptoms, which often happens too late to stop permanent harm. As a result, there is a strong need for easy-to-use, data-based tools. By finding high-risk people early using common clinical data, death rates can be greatly reduced through quick action.
+The Shift from Statistics to Machine Learning
+Heart disease data is complex and chaotic. In the past, researchers mostly used traditional statistical methods such as logistic regression. These methods are very suitable for explaining causal relationships, such as proving that 'smoking leads to heart disease'. Therefore, they often care more about following strict mathematical rules to make predictions for new patients, but the accuracy of such predictions may not be high.
+In contrast, machine learning represents a new way of thinking. As highlighted by Haug and Drazen (2023) in the New England Journal of Medicine, machine learning algorithms focus less on "why" and more on "what's next", prioritizing high predictive accuracy for unseen data. Unlike traditional statistics, machine learning can easily handle complex data in modern medical records and better detect early patients.
+This change is key for the future of augmented medicine. The goal is to mix human skills with the power of AI. As noted by Moor et al. (2023) in Nature, the amount of data doctors can look at at once is small, but modern AI models can read huge amounts of complex info and find hidden clues that people can't see. Therefore, it is needed to use machine learning in cardiology. We need it to manage today's complex data and truly reach exact and tailored care. Therefore, it is necessary to use machine learning in cardiology. We need it to handle the complex data of modern patients and truly achieve precise and personalized treatment.
+Theoretical Framework of Algorithms
+This section provides an overview of the three algorithms used in this study. They are logistic regression, random forest, and xgboost, respectively explaining their principles and current applications in the medical field, and comparing them.
+Logistic Regression
+Logistic regression is widely regarded as the standard probability statistical model for binary classification problems in medical research, especially when the target variable is binary, such as the presence of heart disease(Sperrin et al., 2020). Unlike linear regression that predicts continuous results, LR gives the probability that an instance belongs to a specific class.
+Mathematically, the model uses the logistic function to map input variables to a probability value between 0 and 1. The relationship can be expressed as:
+
+Where p represents the probability of the positive class (heart disease),  is the intercept, and  are the coefficients associated with the predictors  (Hosmer et al., 2013).
+Figure 2.1 visually shows this process, displaying the classic S-shaped curve of the Sigmoid function. As seen in the figure, this function converts any linear input z (ranging from -∞ to +∞) into a probability range of [0,1], with a decision cutoff usually set at 0.5.
+
+Figure 2.1The Logistic (Sigmoid) Function
+
+Christodoulou et al. (2019) emphasized the role of logistic regression as a benchmark in a systematic review, and although LR relies on linear assumptions, it remains a key benchmark. Any other advanced nonlinear model must demonstrate better performance than it before it should be adopted, as nonlinear models have higher computational complexity compared to logistic regression.
+Interpretability is the main advantage of LR. This is where it differs from black box machine learning models. LR can reflect which specific risk factors lead to the final disease. For example, it can quantify that for every unit increase in cholesterol, the probability of a patient developing heart disease increases by x times
+Random Forest
+Random forest is an improvement on traditional decision trees. Conceptually, the function of a single decision tree is similar to a medical flowchart, which divides patients into different groups and makes decisions based on specific rules (such as "age>60 years old?"). Although this simple structure is easy to explain, it also has drawbacks - every tree may have flaws, which we call "instability"(Schonlau & Zou, 2020).
+Specifically, a single decision tree is too sensitive. Its response to the training dataset will be very strong. For example, if I only change a small detail in the dataset, the logical structure of the entire tree may be completely altered.
+The above explanation has led to overfitting issues. We can imagine a tree as a student who only remembers the answers to practice tests, but does not understand the concepts. When faced with a new problem, the answer may be incorrect. For a single decision tree, it perfectly learns random noise and the specific details of patients in the training set, but it does not learn the general patterns of diseases, so it may fail in diagnosing new patients (Ghosh et al., 2021).
+To address this limitation, Breiman (2001) introduced the random forest algorithm. This method aggregates a large number of different trees, creating an integrated model that no longer relies on a single decision tree.
+The reason why random forests are so stable is because the core mechanism behind them is Bagging (Bootstrap Aggregating), a technique originally proposed by Breiman (1996). Through Bagging, this algorithm randomly samples and replaces to generate multiple training subsets. Then, by training each tree on different subsets and combining the predicted results of each tree. Random forest effectively eliminates individual errors and noise in a single decision tree. So, random forests have excellent generalization ability because they can correctly diagnose new patients by learning patterns.
+As illustrated in Figure 2.2, the Random Forest model operates by constructing  parallel decision trees. Each tree receives a different subset of the Cleveland data. Finally, the'Majority Voting mechanism aggregates these outputs to produce a stable diagnosis.
+
+Figure 2.2The architecture of the Random Forest algorithm.
+Mathematically, the prediction mechanism of the Random Forest can be formalized as a majority voting process. Let  be the total number of trees in the forest, and let  represent the classification result (e.g., 0 or 1) given by the -th tree for a patient's input data $x$. The final prediction  is determined by the mode (the most frequent value) of the individual tree predictions:
+
+Alternatively, this can be expressed using the argmax function over the classes. If we define  as the indicator function, the model assigns the patient to the class $c$ that receives the highest number of votes:
+
+This mathematical structure ensures that the final decision is not dominated by the error of any single tree, thereby mathematically guaranteeing the stability discussed by Breiman (2001).
+XGBoost
+Random Forest is a democratic vote where many individual decision trees vote simultaneously, and the result with the most votes wins. But XGBoost is different from it, as it uses a method called Boosting.
+The theoretical basis of XGBoost comes from Friedman (2001) and his Gradient Boosting Machine (GBM). The difference between random forest and random forest is that random forest involves multiple numbers growing simultaneously and participating in decision voting, while Friedman's method constructs trees one by one, not simultaneously. Ali et al. (2023) explained in recent cardiovascular studies that this method is logically simple but very powerful. The establishment of each tree is to correct the mistakes made by the previous tree, which means that the tree's decisions are not made from scratch, but constantly learn from past mistakes.
+Chen (2016) developed XGBoost, which is based on Friedman's theoretical framework. XGBoost provides a more scalable and effective implementation of gradient enhancement. To illustrate the operational differences between these algorithms, we can compare them with the medical diagnostic process.
+As shown in Figure 2.3, the working mode of XGBoost is very different from that of random forest. RF uses parallel processing, building all trees at once, while XGBoost builds trees one by one. The data stream is passed through a series of trees, and the final result is obtained, where the error of tree 1 (as indicated by the red arrow) becomes the training target of tree 2. This mode allows the model to make gradual corrections, which can focus on patients who are difficult to determine whether they have the disease.
+
+
+Figure 2.3The XGBoost Architecture
+Chang et al. (2022) emphasized that the behavior of random forests is like a group of doctors independently diagnosing and  voting and then obtaining the final result. XGBoost is like a team of experts, where each expert continues to diagnose based on the previous expert's diagnosis. Specifically, after the initial diagnosis is made in the first decision tree, subsequent decision trees only focus on patients who were misdiagnosed in the previous step. By repeatedly repairing past errors through multiple trees, the algorithm gradually improves its ability to make clinical judgments. Due to this mechanism, XGBoost can effectively transform weak predictions into high-precision predictions, making it highly effective for complex diseases (Ali et al., 2023).
+The main idea suggested by Chen (2016) is to add regularization into the objective function. As noted before, older models struggle with overfitting, as they create too complicated rules to fit each patient in the training dataset. XGBoost fixes this problem by using a 'penalty method'. Basically, if the model rules become complex and not needed, it will punish the model, letting the algorithm skip random noise and stick to only the most important factors. This makes sure the model stays simple and stable, which is key for correctly checking new patients outside of the training dataset.
+Regularization A key theoretical advancement of XGBoost, introduced by Chen(2016), is the integration of a regularized objective function:
+
+Among them,  is a regularization introduced to penalize the model from becoming complex. This mechanism can prevent overfitting of the model due to training noise, which gives XGBoost a more significant advantage in processing medical data compared to traditional GBM
+Summary of Algorithmic Selection
+As shown in Table 2.2, the complexity and interpretability of these three algorithms are explained. The advantage of logistic regression is good interpretability, but it cannot capture non-linear correlations in heart disease data. On the other hand, Random Forest and XGBoost have much better ability to handle complex data, but their interpretability is poor.
+We can see from the table that the main issue of this study is that although XGBoost and Random Forest may provide higher accuracy, they lack interpretability, which leads to a lack of clinical trust in them. This is the reason why SHAP was used in this study to increase the interpretability of the models, as it can compensate for the shortcomings of these models.
+Table 2.1Configuration of Hyperparameters for Grid Search
+Feature
+Logistic Regression 
+(LR)
+Random Forest (RF)
+XGBoost (XGB)
+Model Type
+Linear Statistical Model
+Ensemble (Bagging)
+Ensemble (Boosting)
+Learning Method
+Maximum Likelihood Estimation
+Parallel decision trees (Majority Voting)
+Sequential decision trees (Gradient Descent)
+Non-linearity
+Low (Assumes linear relationship)
+High (Captures complex patterns)
+Very High (Optimized for complexity)
+Overfitting Risk
+Low (Underfitting is more common)
+Low (Reduced by averaging trees)
+Moderate (Controlled by Regularization)
+Interpretability
+High (White Box)
+(Coefficients / Odds Ratio)
+Medium/Low (Black Box)
+(Feature Importance)
+Low (Black Box)
+(SHAP required)
+Role in Study
+Baseline for comparison
+Robust model for small data
+High-performance model
+
+Explainable AI
+Although ensemble learning algorithms such as random forest and XGBoost have significantly improved prediction accuracy, they lack interpretability. This section reviews the theoretical conflict between model performance and interpretability and introduces SHAP as a solution.
+The Black-Box Problem in Healthcare
+In the field of medicine, especially in clinical diagnosis, it is not enough to obtain an accurate diagnostic result. Doctors must know why the model produces such results. Compared to traditional logistic regression, its prediction process is transparent, and doctors can know which risk factors led to the final diagnosis result. However, these machine learning algorithms are black box (Linardatos et al., 2020). The model uses thousands of complex trees to calculate the results during prediction, and their internal calculation process is hidden. So even if the model gives the correct answer, doctors do not know how it arrived at this answer, so they cannot trust the results given by the model.
+Due to the hidden internal logic of the model, serious trust issues have arisen. As Ghassemi et al. (2021) pointed out, blindly trusting machines without knowing why algorithms make diagnostic results is very dangerous in life-threatening diseases such as heart disease.
+When doctors are unable to understand how artificial intelligence infers conclusions, they develop "algorithmic aversion" (Dietvorst et al., 2015). This psychological term simply means that people are very intolerant of computersGaube et al. (2021). If human doctors make mistakes, we may forgive them; But if artificial intelligence makes a mistake, we will immediately stop trusting it. Therefore, in order for doctors to truly use these tools, we mustopen the black box and explain predictions in plain language.
+SHAP
+To address the issue between accuracy and interpretability, Lundberg and Lee (2017) proposed SHAP. The theoretical basis of this method comes from cooperative game theory.
+Simply put, SHAP calculates the precise contribution of each input feature to the final prediction. For example, if the model predicts an 80% risk of heart disease, SHAP will accurately determine through mathematical methods how much of that percentage is caused by "age" and how much is caused by "cholesterol". It assigns a specific numerical value to each feature, allowing us to accurately see which factors drive artificial intelligence decisions(Lundberg et al., 2018).
+SHAP provides two levels of explanation that are crucial for this study:
+Global interpretability: It treats the dataset as a whole to search for general patterns. It answers the question: "Which symptom is usually the biggest warning signal among all patients - cholesterol or age.
+Local interpretability: It explains the diagnosis of a specific patient. For example, it can indicate that for patient A, the risk predicted by artificial intelligence is high, especially due to their chest pain, even if their age is low.
+SHAP can accurately calculate the impact of each factor on the results, providing clear reasons for machine learning models to make predictions. This enables the model not only to be used for prediction, but also to increase doctors' trust in the system, thereby promoting its clinical application.
+Related Works on Heart Disease Prediction
+Machine Learning on UCI Dataset
+In recent years (2020-2024), research on the UCI Cleveland dataset has been strengthened, and scholars have adopted increasingly complex integration and mixing techniques to maximize diagnostic accuracy.
+Fitriyani et al. (2020) demonstrated that a more complete dataset can train models more accurately. They used a method called DBSCAN to remove outliers (noise or incorrect data points) before training the model, and with this method for data preprocessing, their accuracy reached 95.90%. Similarly, Spencer et al. (2020) only focused on the eigenvalues of the dataset, meaning they only selected the factors most relevant to the disease and used this data to avoid model confusion. Through this data filtering method, they demonstrated that identifying the correct risk factors is equally important as choosing complex algorithms.
+Shorewala (2021) studied the effect of mixed models on correctness. They did not use just one model, but instead used a group of simple models to decide on the results. This multi-model way reached a success rate of 87%, showing that the mixed model is steadier than just one model. Later, Bharti et al. (2021) suggested a mixed method that joins standard machine learning and deep learning. By putting these different models together, they raised the correctness to 94.20%, clearly beating just one model.
+Chang et al. (2022) mixed two different algorithms: random forest and neural network. They used the strengths of two algorithms and got a 96.60% accuracy rate. Bhatt et al. (2023) looked at improving models. They did not make a new model, but carefully tweaked the settings of the random forest algorithm, reaching an accuracy of 94%. This shows that if the setup is right, tree based models are still very good for medical datasets.
+On this basis, Aleem et al. (2024) carefully examined the different uses of Random Forest and XGBoost on the UCI Cleveland dataset. They compare integrated learning methods with standard single models, such as decision trees and SVM. They proved that ensemble learning methods are better because they can handle complex clinical data and discover complex linear relationships that traditional methods find difficult to detect. And they showed that random forests reduced the risk of model overfitting, while XGBoost improved prediction accuracy, with an accuracy rate exceeding 90%.
+In addition, the large-scale comparative study published in Wiley provides a broader perspective. They are not studying a single data source, their research focuses on testing many different heart disease datasets (including Cleveland, Framingham, etc.). Because the model may be accurate in training and predicting data from a certain group of patients, but there may be bias when using data from another group of patients. By examining these different datasets, Sakyi-Yeboah et al.(2025) research shows that tree based models such as Random Forest and XGBoost not only have high accuracy on one set of data, but are equally effective on different datasets. They have proven to be reliable and powerful, maintaining stability and accuracy even when data changes.
+The above studies have demonstrated the success of ensemble learning technology to varying degrees, but a key gap has also been identified in the 2024 research and early work. Although these studies have achieved increasingly high accuracy, they have missed the real needs in clinical settings. Specifically, Aleem et al. only provided a global explanation in 2024. They showed doctors which symptoms are dangerous for most people (e.g. 'usually, high heart rate is not good'). It cannot explain the exact case, and when the model diagnoses a patient, it cannot provide a local interpretation of the patient's results. This is a key missing point because in daily work, doctors treat real and unique individuals. Doctors need to know why 'Patient A' is considered high-risk.
+Furthermore, none of these studies provided a usable tool (such as web applications). In this way, doctors actually cannot really use these models. The result is a lack of direct feedback from the medical field, and scholars are only burying their heads in researching code; Although these studies have demonstrated the accuracy of predictions, there has been no investigation into whether doctors truly believe the conclusions drawn by the model in their daily work.
+Therefore, this study fills this gap. This study developed a system that first verifies high accuracy, and then uses clear SHAP explanations to let doctors know the reasons for each patient's diagnosis. Feedback from relevant personnel is obtained through the Streamlit dashboard and quantitative survey questionnaire to ensure the credibility of the results.
+To provide a clear overview of the current research status, Table 2.1 summarizes these key studies, highlighting their methods, performance achievements, and existing limitations in clinical applications.
+Table 2.2Comparative Analysis of Recent Studies on Heart Disease Prediction (2020–2025)
+Study
+Focus
+Methodology 
+Accuracy
+Deployment 
+(Web App)
+Interpretability 
+(SHAP)
+Clinical Validation 
+(User Feedback)
+Fitriyani et al. (2020)
+Data Quality: Used outlier detection to clean data before training.
+DBSCAN + Ensemble
+95.90%
+No
+No (Black Box)
+No
+Spencer et al. (2020)
+Feature Selection: Filtered relevant symptoms to reduce noise.
+BayesNet + Selection
+85.00%
+No
+No (Black Box)
+No
+Shorewala (2021)
+Stability: Proved that combining weak models via voting is stable.
+Voting Ensemble
+87.00%
+No
+No (Black Box)
+No
+Bharti et al. (2021)
+Hybridization: Combined traditional ML with Deep Learning.
+Hybrid (ML + DL)
+94.20%
+No
+No (Black Box)
+No
+Chang et al. (2022)
+Complexity: Merged tree logic with neural networks for high precision.
+Hybrid (RF + ANN)
+96.60%
+No
+No (Black Box)
+No
+Bhatt et al. (2023)
+Optimization: Fine-tuned hyperparameters for peak performance.
+Optimized Random Forest
+94.00%
+No
+No (Black Box)
+No
+Aleem et al. (2024)
+Balancing accuracy and interpretability.
+Ensemble Learning
+90%+
+No
+Feature Importance
+No
+Sakyi-Yeboah et al. (2025)
+Performance benchmarking across datasets.
+Multi-algorithm Comparison
+Varies
+No
+Limited(Global Only)
+No
+This Study
+Holistic System: End-to-end framework with explainability & trust.
+Ensemble (RF & XGBoost)
+(Ch.4)
+Yes (Streamlit)
+Yes (SHAP)
+Yes (Questionnaire)
+
+
+
+Limitations of Existing Studies
+Although research in recent years has demonstrated the accuracy of technology, critical analysis of current literature reveals three fundamental gaps that continue to hinder clinical deployment.
+Even in 2024, the research field still places great emphasis on algorithm performance. The latest research by Aleem et al. (2024) and Sakyi-Yeboah et al. (2025) is strictly limited to the field of computation. Although they provided high-precision indicators, they did not take into account the lack of available prototype systems for clinical doctors.
+Most of the reviewed studies did not integrate XAI tools such as SHAP to explain why specific predictions were made. Only Aleem used SHAP for global interpretation in 2024 but was unable to provide real-time local interpretation for specific patients, making it difficult for clinical doctors to validate medical logic.
+So, the biggest deficiency is the complete lack of people-oriented evaluation. These 8 studies did not conduct systematic usability and interpretability surveys on healthcare professionals. They validated the model in mathematical  theory but overlooked the credibility and usability of the validation tool in actual users.
+To bridge these gaps, this study presents a complete system. It combines ensemble methods, SHAP explanations, and a Streamlit Web tool to improve ease of use, backed by a survey of medical staff. This prototype tests whether accurate machine learning models are truly reliable and useful in real-world situations.
+
+
+
+
+
+
+Methodology
+Introduction
+This chapter provides an overview of the systematic research methodology used to achieve the research objectives mentioned in Chapter 1. This chapter mainly describes the research concepts, data collection strategies, preprocessing techniques, implementation of machine learning models, development and evaluation process of network prototypes. This method aims to ensure the reliability, reproducibility, and effectiveness of research results.
+Research Design
+This study adopts a quantitative research design and is mainly divided into two stages. The first stage focuses on evaluating the performance of the model using various statistical indicators, while the second stage adopts standardized survey methods to quantitatively assess the usability and interpretability of the system. Therefore, this study first involves collecting computational performance data and then analyzing structured questionnaires to obtain feedback from relevant users. The nature of the research question determines the use of this research approach, as this study requires objective validation of the predictive accuracy and actual utility of medical artificial intelligence models. This study is divided into two different phases.
+Modal Development and Performance Evaluation
+The main objective of this stage is to answer research question 1 (RQ1) regarding the performance comparison of machine learning algorithms. At this stage, using the Cleveland Heart Disease dataset, 80% of the data is segmented for training, 20% for testing, and repeated multiple times. At this stage of research, three different algorithms were trained, validated, and tested: logistic regression (as baseline), random forest, and XGBoost.
+In order to evaluate the completeness, a complete set of indicators was used in this stage, including accuracy, precision, recall, F1 score, and AUC-ROC. Considering the potential issues with medical datasets, such as class imbalance, it may be incorrect to rely solely on accuracy as mentioned in the literature (Chicco & Jurman, 2020). Therefore, this study used F1 score and AUC-ROC as the main criteria for selecting the final model. The model selected in this way will be more reliable, ensuring that the selected model can work well even in cases of imbalanced data.
+Prototype Development and Quantitative User Validation
+Based on the results of the first stage, this stage answered research question 2 (RQ2) regarding clinical usability and interpretability. This study selects the best model from the first stage and integrates it into the web system. In order to address the black box issue of the model, SHAP will be combined in the system to explain the model.
+Next, a quantitative user survey will be conducted on medical students or individuals with a medical background (N=30). This study used structured questionnaires, mainly the System Usability Scale (SUS) and the Likert Scale, to evaluate the usability and interpretability of the system. In this stage, real data is collected to measure user satisfaction and trust, and to evaluate whether high-precision machine learning algorithms can be well applied in clinical environments.
+Research Framework
+The overall framework of this study is shown in Figure 3.1. This flowchart describes the entire process from the dataset to the evaluation of algorithm performance, to the development of prototypes, to the evaluation of prototypes.
+
+
+Figure 3.1The Operational Framework of the Study
+Data Acquisition and Description
+Data Source
+The dataset used in this study comes from the UCI machine learning library, which is the well-known Cleveland Heart Disease dataset widely used to validate the effectiveness of machine learning algorithms in the field of cardiovascular disease prediction.
+Dataset Description
+The original database contains 76 attributes; however, all published experiments refer to using a subset of 14 attributes that are deemed clinically relevant. The dataset consists of 303 instances.The num variable is target, where a value of 0 indicates the absence of heart disease (Healthy), and values 1-4 indicate the presence of heart disease. For the purpose of this binary classification study, values 1-4 are aggregated into a single positive class (1 = Heart Disease).
+Table 3.1Description of Attributes in the Cleveland Heart Disease Dataset
+Attribute
+Description
+Type
+age
+Age of the patient in years
+Numerical
+sex
+Gender of the patient (1 = Male; 0 = Female)
+Categorical (Binary)
+cp
+Chest Pain Type (1: Typical angina, 2: Atypical angina, 3: Non-anginal pain, 4: Asymptomatic)
+Categorical (Nominal)
+trestbps
+Resting blood pressure (in mm Hg on admission to the hospital)
+Numerical
+chol
+Serum cholesterol in mg/dl
+Numerical
+fbs
+Fasting blood sugar > 120 mg/dl (1 = True; 0 = False)
+Categorical (Binary)
+restecg
+Resting electrocardiographic results (0: Normal, 1: ST-T wave abnormality, 2: LV hypertrophy)
+Categorical (Nominal)
+thalach
+Maximum heart rate achieved
+Numerical
+exang
+Exercise induced angina (1 = Yes; 0 = No)
+Categorical (Binary)
+oldpeak
+ST depression induced by exercise relative to rest
+Numerical
+slope
+The slope of the peak exercise ST segment (1: Upsloping, 2: Flat, 3: Downsloping)
+Categorical (Nominal)
+ca
+Number of major vessels (0-3) colored by fluoroscopy
+Numerical
+thal
+Thalassemia (3 = Normal; 6 = Fixed defect; 7 = Reversable defect)
+Categorical (Nominal)
+num
+Diagnosis of heart disease (0: < 50% diameter narrowing; 1: > 50% diameter narrowing)
+Target Variable
+Data Preprocessing
+Raw clinical data often cannot be directly used by machine learning algorithms.To ensure the performance and effectiveness of the model, data preprocessing is essential (Sarker, 2021). The preprocessing includes missing value processing, categorical variable encoding, feature scaling, and data segmentation.
+Handling Missing Values
+Although the Cleveland dataset is of relatively high quality compared to other subsets. However, there are still a small number of missing values in this dataset. Among them, the ca (number of major blood vessels) attribute has 4 missing entries, and the thal (thalassemia) attribute has 2 missing entries. In order to maintain sample size, this study used statistical imputation method for data processing (Little & Rubin, 2019).
+Numerical Imputation: Replace missing values in ca with the most frequent value, as the ca value is a discrete integer.
+Categorical Imputation: The missing values in thal are also replaced with the most frequent values.
+Categorical Data Encoding
+Machine learning models strictly require numerical input. Therefore, categorical variables identified in Table 3.1 are transformed using two distinct techniques:
+Label Encoding: Applied to binary variables such as sex (0/1), fbs (0/1), and exang (0/1). These are already in a binary format and require no further expansion.
+One-Hot Encoding: For nominal variables with two or more categories, apply a hot encoding. This technique creates a new binary column for each unique category. This step is to prevent the algorithm from making incorrect assumptions (Hancock & Khoshgoftaar, 2020).
+Due to the requirement of numerical input for machine learning algorithm parameters, this study uses single hot encoding to convert categorical variable types. The process of this transformation mainly involves expanding the original variable into multiple binary variables, which can avoid machine learning algorithms creating incorrect relationships between multiple categories of this variable. Table 3.2 shows detailed information on how to handle these variables.
+Table 3.2Application of One-Hot Encoding on Categorical Variables
+Variable
+Original Category
+New Feature Name (Binary Column)
+Chest Pain Type (cp)
+Typical Angina
+cp_typical
+
+Atypical Angina
+cp_atypical
+
+Non-anginal Pain
+cp_non_anginal
+
+Asymptomatic
+cp_asymptomatic
+Resting ECG (restecg)
+Normal
+restecg_normal
+
+ST-T Wave Abnormality
+restecg_st_t
+
+Left Ventricular Hypertrophy
+restecg_lvh
+ST Slope (slope)
+Upsloping
+slope_up
+
+Flat
+slope_flat
+
+Downsloping
+slope_down
+Thalassemia (thal)
+Normal
+thal_normal
+
+Fixed Defect
+thal_fixed
+
+Reversable Defect
+thal_reversable
+
+Feature Scaling
+The attribute features in this dataset vary greatly. For example, the value of cholesterol can reach 564mg/dl, but the range of oldpeak is usually between 0-6. If larger values are not scaled, algorithms like logistic regression may consider larger numbers more important than smaller ones. To avoid this problem, this study applies Standardization to scale all features. After this process of transformation, all data has the same proportion, which ensures that the model has the same weight for each feature and does not focus on the original size of the feature data. (Maini et al., 2021).
+Standardization was used on continuous numerical variables to remove bias due to different units. Table 3.3 shows the five key attributes that received feature scaling, pointing out the large differences in their original values.
+Table 3.3Numerical Features Selected for Standardization
+Variable
+Description
+Unit / Range
+Reason for Scaling
+age
+Age of the patient
+Years (29 – 77)
+To normalize the variance with other features.
+trestbps
+Resting blood pressure
+mmHg (94 – 200)
+High magnitude compared to oldpeak.
+chol
+Serum cholesterol
+mg/dl (126 – 564)
+Has the largest numerical range in the dataset.
+thalach
+Maximum heart rate achieved
+bpm (71 – 202)
+Significantly different scale from age or oldpeak.
+oldpeak
+ST depression induced by exercise
+Numeric (0.0 – 6.2)
+Very small range; easily dominated by chol if not scaled.
+Data Splitting
+In order to evaluate the generalization performance of the model, this study divided the dataset into a training set and a testing set.
+Proportion: Adopting the standard 80:20 segmentation (80% for training and 20% for testing) is a common practice in machine learning research to balance training datasets and validate model performance (Kavitha et al., 2021).
+Machine Learning Algorithms
+This section provides a detailed introduction to the specific implementation methods of these three algorithms. All models and web applications are developed in the Pycharm editor using Python language, version 3.9. The reason for choosing Pycharm is that it has strong code management capabilities and integrates debugging tools, which can effectively use machine learning algorithms and develop modularity with streamlit. The libraries used mainly include Scikit learn and XGBoost.
+Logistic Regression
+This study used the logistic regression class in the Scikit learn library to implement the logistic regression algorithm, in order to have a baseline for comparison in the future. This model is configured with default parameters to represent standard statistical methods, by setting the regularization parameter C to 1.0 and then using the "lbfgs" solver (Limited-memory Broyden–Fletcher–Goldfarb–Shanno). The computational efficiency is high for small-scale datasets such as Cleveland. This model can provide interpretable coefficients, so its main function in methodology is to serve as a control group, comparing its predictive ability with random forest and XGBoost algorithms.
+Random Forest
+The reason for choosing the random forest model is that it is very good at discovering complex hidden patterns in patient data, such as how age interacts with heart rate. This study used RandomForestClassifier from the Scikit-learn library.
+Due to the relatively small size of the dataset, there is a risk of overfitting when using default settings. To prevent this situation, this study adjusted two key parameter settings: the total number of trees (n_estimators) and the maximum depth per tree (x_depth).
+
+To address the issue of algorithm imbalance, this study adjusted the class weight parameter. This prioritizes minority groups, namely high-risk patients, during the training process, and punishes the model more for missed diagnoses rather than false positives, thereby improving the sensitivity of the model
+XGBoost
+The main reason for choosing Extreme Gradient Boosting for this study is its built-in regularization mechanism. This can be seen as a safety brake that not only prevents model rules from becoming too complex, but also avoids memory noise when dealing with small datasets.This implementation utilizes XGBClassifier from the dedicated xgboost Python library, providing a high-performance framework for gradient boosting.
+To ensure optimal performance of the model, this study did not rely on default settings. Firstly, we adjust the structure of the model by adjusting the number of enhancement rounds (n_estimators) and the maximum depth of each tree (x_depth). Finding the right balance here is crucial: if the trees are too deep, the model will become too complex; If they are too shallow, important patterns cannot be captured. This study uses grid search to find the optimal point that balances complexity and accuracy.
+Finally, to prevent overfitting, this study optimized the learning rate and gamma parameter. This study prioritizes lower learning rates, which allow the model to learn slowly and carefully. Gamma is used as a strict threshold to trim branches that contribute less to prediction. In addition, the objective function is also set to binary, which ensures that the model can output accurate probabilities, rather than just a simple yes/no label, which is crucial for calculating the AUC-ROC score during the evaluation phase.
+Hyperparameter Tuning (Model Optimization)
+In order to ensure fair comparison, this study does not rely on the default parameter settings of machine learning algorithms, as these configurations have not been optimized for this specific dataset. Therefore, this study adopted a systematic process of cross validation grid search to fine tune the parameter settings of each model to achieve optimal performance (Yang & Shami, 2020).
+Strategy: Grid search is a system trial and error process. This study will set a series of different parameters. Then, the algorithm will automatically try each possible combination of these settings one by one. By comparing the results of these parameters, the most suitable model parameters for the current dataset can be identified.
+Verification method: In order to ensure the reliability of the results, this study used 5-fold cross validation in the tuning process (Kohavi, 1995). Divide the dataset into 5 parts, train the model on 4 parts for each parameter combination, and test on the remaining 1 part. This process is repeated 5 times, and then the average score of the model is calculated. This rigorous testing can prevent the model from overfitting to specific datasets.
+The Success Metric: These models are evaluated and ranked based on their F1 scores and AUC-ROC, rather than relying solely on simple accuracy. Due to the critical balance between accuracy and recall required for medical diagnosis, F1 score is given priority to ensure that the model minimizes false negatives to the greatest extent possible and does not overlook high-risk patients (Subramani et al., 2023). In addition, the area under the receiver operating characteristic curve (AUC-ROC) was used to evaluate the overall ability of the model to distinguish between heart disease patients and healthy individuals at all classification thresholds, providing a comprehensive measure of performance stability (Aleem et al., 2024).
+Parameters Tuned: For Random Forest, We optimize the number of trees (n_estimators) and the maximum depth of the trees (max_depth) to control model complexity.For XGBoost, in addition to tree depth, we tune the learning rate, which controls how quickly the model corrects its errors during training.
+The specific hyperparameters and their corresponding value ranges used for the Grid Search are presented in Table 3.2. This configuration ensures that the models are explored across a diverse set of settings to identify the optimal combination.
+Table 3.4Configuration of Hyperparameters for Grid Search
+Algorithm
+Hyperparameter
+Description
+Search Grid (Values)
+Random Forest
+n_estimators
+The number of trees in the forest.
+[50, 100, 200, 300]
+
+max_depth
+The maximum depth of the tree to control overfitting.
+[None, 10, 20, 30]
+
+min_samples_split
+The minimum samples required to split an internal node.
+[2, 5, 10]
+XGBoost
+learning_rate
+Step size shrinkage used to prevent overfitting.
+[0.01, 0.05, 0.1, 0.2]
+
+n_estimators
+The number of boosting rounds.
+[50, 100, 200]
+
+max_depth
+Maximum tree depth for base learners.
+[3, 5, 7, 9]
+
+gamma
+Minimum loss reduction required to make a further partition.
+[0, 0.1, 0.2]
+System Development
+To bridge the gap between theoretical modelling and clinical application, the best-performing model from Phase 1 is deployed as a web-based Clinical Decision Support System.
+Development Framework: Streamlit
+The prototype is developed using Streamlit, an open-source Python framework designed specifically for data science applications. Streamlit is selected for this study because:
+It allows for the direct transformation of Python scripts into interactive web apps without requiring complex backend web development.
+It supports real-time data input and immediate visualization updates, which is essential for a diagnostic tool.
+System Architecture The application workflow
+Input Module: A user-friendly sidebar where clinicians can manually input patient parameters (e.g., Age, Cholesterol, CP Type) using sliders and dropdown menus.
+Inference Engine: The pre-trained machine learning model runs in the background to process inputs and generate a real-time prediction.
+Visualization Module: The system displays the probability score and integrates SHAP plots to explain the prediction logic.
+
+Model Interpretability
+To address the "black-box" limitation of ensemble learning models (Random Forest and XGBoost), this study integrates SHAP into the web prototype.
+SHAP Framework
+SHAP is a game-theoretic approach to explain the output of any machine learning model (Lundberg & Lee, 2017). It assigns each feature an importance value for a particular prediction.It identifies which features (e.g., Chest Pain) are generally most important across all patients. For a specific patient, it calculates how much each feature contributed to increasing or decreasing the risk score from the baseline.
+In the Streamlit app, a SHAP plot is automatically created for every patient to explain the specific diagnosis. This chart breaks down the AI's decision into two opposing forces: it uses red bars to show risk factors that push the result toward "Heart Disease" and blue bars to show protective factors that lower the risk. By clearly seeing which symptoms caused the model to make its decision, doctors can easily check if the AI's logic makes sense medically, which helps build trust in the system.
+Usability and Interpretability Evaluation
+To verify the usability and interpretability of the developed web application. This study used quantitative survey methods. The evaluation focuses on two key dimensions: using a standard system usability scale to create a questionnaire to validate the system's usability, and using a structured Likert scale to assess the system's interpretability.
+Participants and Sampling Strategy
+This study adopted a purposive sampling strategy to ensure the effectiveness of quantitative survey statistics. Thirty participants with relevant knowledge in the medical field were recruited as the target sample. The inclusion criteria require participants to be medical students, junior doctors, or general practitioners, and they have sufficient digital literacy to browse basic web interfaces.
+Evaluation Procedure
+The evaluation will be conducted remotely through an online platform. The program consists of three steps:
+Task performance: Participants will receive links to the Streamlit network prototype and a set of hypothetical patient data (e.g. age=65, cholesterol=300). They were asked to input this data into the system, generate predictions, and check SHAP visualizations.
+Survey management: After completing the prediction task, participants will be immediately guided to Google Sheets to complete a structured questionnaire.
+Feedback collection: The entire process is anonymous to encourage honest feedback on system performance.
+The Survey Instrument
+The questionnaire is divided into two distinct sections to address Research Question 2 (RQ2):
+The first part is the System Usability Scale (SUS). This section adopts the industry standard 10 item system availability measurement table developed by Brooke (1996). It measures the overall usability and learnability of the system. Participants rate items such as' I think the system is easy to use 'on a Likert 5-point scale, ranging from strongly disagree (1) to strongly agree (5).
+The second part is the interpretability and trust scale. To evaluate the components of explainable artificial intelligence (SHAP), a specialized 4-point scale adapted from Hoffman et al. (2018) was used. This section measures:
+Understanding: "The SHAP visualizations helped me understand why the model made the prediction."
+Trust: "The explanations increased my confidence in the model's reliability."
+Clinical Alignment: "The model's logic aligns with my medical knowledge."
+Usefulness: "This visual explanation would be useful for clinical decision support."
+Data Analysis Plan
+The collected data will be analyzed using descriptive statistics:
+Usability analysis: The SUS score will be calculated using the standard formula (sum of contributions x 2.5) to obtain a comprehensive score between 0 and 100. The result will be based on a score of 68, which is considered the threshold for "average" availability (Bangor et al., 2008).
+Interpretability analysis: Analyzing the interpretability of a system by calculating the mean and standard deviation. An average score greater than 3.0 (on a 4-point scale) indicates a high level of clinical trust and clarity in the system.
+Summary
+This chapter provides an overview of the comprehensive methods used in this study and provides a detailed introduction to the training and optimization of the Random Forest and XGBoost models. In addition, it also describes the development of the Streamlit interface and the interpretability integration of SHAP. Finally, a framework for evaluating model performance and system availability was defined. The next chapter (Chapter 4) will introduce the results and findings obtained from this method.
+
+
+
+
+
+
+
+
+References
+Aleem, M., Al Mamun, M. A., Islam, M. T., Hossain, K., Khandakar, S., Abid, M., ... & Saleem, A. (2024). Comparative Analysis of Advanced Ensemble Learning Techniques for Accurate and Interpretable Heart Disease Prediction. International Journal of Communication Networks and Information Security, 16(5), 1A-12.
+Ali, M. M., Paul, B. K., Ahmed, K., Bui, F. M., Quinn, J. M., & Moni, M. A. (2021). Heart disease prediction using supervised machine learning algorithms: Performance analysis and comparison. Computers in Biology and Medicine, 136, 104672.
+Antoniadi, A. M., Du, Y., Guendouz, Y., Wei, L., Mazo, C., Becker, B. A., & Mooney, C. (2021). Current challenges and future opportunities for XAI in machine learning-based clinical decision support systems: a systematic review. Applied Sciences, 11(11), 5088.
+Arun, N., Gaw, N., Singh, P., Chang, K., Aggarwal, M., Chen, B., ... & Kalpathy-Cramer, J. (2021). Assessing the trustworthiness of saliency maps for localizing abnormalities in medical imaging. Radiology: Artificial Intelligence, 3(6), e200267.
+Breiman, L. (1996). Bagging predictors. Machine learning, 24(2), 123-140.
+Breiman, L. (2001). Random forests. Machine learning, 45(1), 5-32.
+Chang, V., Bhavani, V. R., Xu, A. Q., & Hossain, M. A. (2022). An artificial intelligence model for heart disease detection using machine learning algorithms. Healthcare Analytics, 2, 100016.
+Chen, T. (2016). XGBoost: A Scalable Tree Boosting System. Cornell University.
+Christodoulou, E., Ma, J., Collins, G. S., Steyerberg, E. W., Verbakel, J. Y., & Van Calster, B. (2019). A systematic review shows no performance benefit of machine learning over logistic regression for clinical prediction models. Journal of clinical epidemiology, 110, 12-22.
+Durán, J. M., & Jongsma, K. R. (2021). Who is afraid of black box algorithms? On the epistemological and ethical basis of trust in medical AI. Journal of medical ethics, 47(5), 329-335.
+Friedman, J. H. (2001). Greedy function approximation: a gradient boosting machine. Annals of statistics, 1189-1232.
+Gaube, S., Suresh, H., Raue, M., Merritt, A., Berkowitz, S. J., Lermer, E., ... & Ghassemi, M. (2021). Do as AI say: susceptibility in deployment of clinical decision-aids. NPJ digital medicine, 4(1), 31.
+Ghassemi, M., Oakden-Rayner, L., & Beam, A. L. (2021). The false hope of current approaches to explainable artificial intelligence in health care. The lancet digital health, 3(11), e745-e750.
+Ghosh, P., Azam, S., Jonkman, M., Karim, A., Shamrat, F. J. M., Ignatious, E., ... & De Boer, F. (2021). Efficient prediction of cardiovascular disease using machine learning algorithms with relief and LASSO feature selection techniques. IEEE Access, 9, 19304-19326.
+Grinsztajn, L., Oyallon, E., & Varoquaux, G. (2022). Why do tree-based models still outperform deep learning on typical tabular data?. Advances in neural information processing systems, 35, 507-520.
+Haug, C. J., & Drazen, J. M. (2023). Artificial intelligence and machine learning in clinical medicine, 2023. New England Journal of Medicine, 388(13), 1201-1208.
+Hosmer Jr, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). Applied logistic regression. John Wiley & Sons.
+Krittanawong, C., Zhang, H., Wang, Z., Aydar, M., & Kitai, T. (2017). Artificial intelligence in precision cardiovascular medicine. Journal of the American College of Cardiology, 69(21), 2657-2664.
+Linardatos, P., Papastefanopoulos, V., & Kotsiantis, S. (2020). Explainable ai: A review of machine learning interpretability methods. Entropy, 23(1), 18.
+Loh, H. W., Ooi, C. P., Seoni, S., Barua, P. D., Molinari, F., & Acharya, U. R. (2022). Application of explainable artificial intelligence for healthcare: A systematic review of the last decade (2011–2022). Computer methods and programs in biomedicine, 226, 107161.
+Lundberg, S. M., & Lee, S. I. (2017). A unified approach to interpreting model predictions. Advances in neural information processing systems, 30.
+Lundberg, S. M., Nair, B., Vavilala, M. S., Horibe, M., Eisses, M. J., Adams, T., ... & Lee, S. I. (2018). Explainable machine-learning predictions for the prevention of hypoxaemia during surgery. Nature biomedical engineering, 2(10), 749-760.
+Maini, E., Venkateswarlu, B., Maini, B., & Marwaha, D. (2021). Machine learning–based heart disease prediction system for Indian population: An exploratory study done in South India. medical journal armed forces india, 77(3), 302-311.
+Martin, S. S., Aday, A. W., Allen, N. B., Almarzooq, Z. I., Anderson, C. A., Arora, P., ... & American Heart Association Council on Epidemiology and Prevention Statistics Committee and Stroke Statistics Committee. (2025). 2025 heart disease and stroke statistics: a report of US and global data from the American Heart Association. Circulation, 151(8), e41-e660.
+Moor, M., Banerjee, O., Abad, Z. S. H., Krumholz, H. M., Leskovec, J., Topol, E. J., & Rajpurkar, P. (2023). Foundation models for generalist medical artificial intelligence. Nature, 616(7956), 259-265.
+Nusinovici, S., Tham, Y. C., Yan, M. Y. C., Ting, D. S. W., Li, J., Sabanayagam, C., ... & Cheng, C. Y. (2020). Logistic regression was as good as machine learning for predicting major chronic diseases. Journal of clinical epidemiology, 122, 56-69.
+Quer, G., Arnaout, R., Henne, M., & Arnaout, R. (2021). Machine learning and the future of cardiovascular care: JACC state-of-the-art review. Journal of the American College of Cardiology, 77(3), 300-313.
+Rajpurkar, P., & Lungren, M. P. (2023). The current and future state of AI interpretation of medical images. New England Journal of Medicine, 388(21), 1981-1990.
+Sakyi-Yeboah, E., Agyemang, E. F., Agbenyeavu, V., Osei-Nkwantabisa, A., Kissi-Appiah, P., Moshood, L., ... & Nortey, E. N. (2025). Heart Disease Prediction Using Ensemble Tree Algorithms: A Supervised Learning Perspective. Applied Computational Intelligence and Soft Computing, 2025(1), 1989813.
+Schonlau, M., & Zou, R. Y. (2020). The random forest algorithm for statistical learning. The Stata Journal, 20(1), 3-29.
+Sperrin, M., Martin, G. P., Sisk, R., & Peek, N. (2020). Missing data should be handled differently for prediction than for description or causal explanation. Journal of clinical epidemiology, 125, 183-187.
+Subramani, S., Varshney, N., Anand, M. V., Soudagar, M. E. M., Al-Keridis, L. A., Upadhyay, T. K., ... & Rohini, K. (2023). Cardiovascular diseases prediction by machine learning incorporation with deep learning. Frontiers in medicine, 10, 1150933.
+Thirunavukarasu, A. J., Ting, D. S. J., Elangovan, K., Gutierrez, L., Tan, T. F., & Ting, D. S. W. (2023). Large language models in medicine. Nature medicine, 29(8), 1930-1940.
+World Heart Federation. (2025). World heart report 2025: Obesity and cardiovascular disease. https://world-heart-federation.org/resource/world-heart-report-2025/

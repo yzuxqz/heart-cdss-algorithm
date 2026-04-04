@@ -27,16 +27,9 @@ venv/
 ENV/
 
 # Project Specific
-artifacts/
-results/
+# (Removed restrictions on datasets and results to allow full upload)
 logs/
-reports/
 catboost_info/
-*.joblib
-*.csv
-*.txt
-!requirements.txt
-!PROJECT_IMPLEMENTATION_REPORT.md
 
 # IDE
 .vscode/

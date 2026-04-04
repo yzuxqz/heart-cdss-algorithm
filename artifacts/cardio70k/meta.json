@@ -1,0 +1,56 @@
+{
+  "dataset": "cardio70k",
+  "csv_path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\cardio_train.csv",
+  "target": "cardio",
+  "best_from_summary": "C:\\Users\\13363\\Desktop\\code\\algorithm\\results\\cardio70k\\20260331_194240_summary.csv",
+  "best_run_id": "20260331_194240",
+  "best_model": "xgb",
+  "best_params": {
+    "subsample": 0.85,
+    "reg_lambda": 2.0,
+    "n_estimators": 900,
+    "min_child_weight": 10,
+    "max_depth": 6,
+    "learning_rate": 0.01,
+    "colsample_bytree": 0.85
+  },
+  "best_row": {
+    "run_id": "20260331_194240",
+    "dataset": "cardio70k",
+    "model": "xgb",
+    "cv_roc_auc": 0.8028397294287375,
+    "test_accuracy": 0.7335714285714285,
+    "test_precision": 0.7526299504950495,
+    "test_recall": 0.6953973699256718,
+    "test_f1": 0.7228826151560178,
+    "test_roc_auc": 0.8007271084006885,
+    "test_pr_auc": 0.7842096703392754,
+    "n_train": 56000,
+    "n_test": 14000,
+    "cv_folds": 2,
+    "n_iter": 2
+  },
+  "models_dir": "C:\\Users\\13363\\Desktop\\code\\algorithm\\artifacts\\cardio70k\\models",
+  "available_models": [
+    {
+      "model": "xgb",
+      "path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\artifacts\\cardio70k\\models\\xgb\\model.joblib"
+    },
+    {
+      "model": "cat",
+      "path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\artifacts\\cardio70k\\models\\cat\\model.joblib"
+    },
+    {
+      "model": "rf",
+      "path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\artifacts\\cardio70k\\models\\rf\\model.joblib"
+    },
+    {
+      "model": "lgbm",
+      "path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\artifacts\\cardio70k\\models\\lgbm\\model.joblib"
+    },
+    {
+      "model": "logreg",
+      "path": "C:\\Users\\13363\\Desktop\\code\\algorithm\\artifacts\\cardio70k\\models\\logreg\\model.joblib"
+    }
+  ]
+}
