@@ -241,13 +241,13 @@ py -m streamlit run app.py --server.port 8507 --server.address localhost
 
 ---
 
-## 10. Future Optimization Suggestions (Thesis Bonus Points)
+## 10. Future System Evolution and Academic Optimization
 
-1. Clean up legacy code blocks in `app.py` to reduce maintenance complexity.
-2. Add "Model Calibration Curves / Brier Score" visualization to strengthen medical decision reliability arguments.
-3. Add statistical significance test modules (DeLong/McNemar).
-4. Add SUS questionnaire page and result aggregation (directly supports thesis usability chapter).
-5. Add a unified `config` file to reduce hardcoded paths and parameters.
+1. Clean up legacy code blocks in `app.py` to reduce system maintenance complexity.
+2. Incorporate "Model Calibration Curves / Brier Score" visualization to strengthen the clinical reliability of medical decisions.
+3. Supplement statistical significance test modules (DeLong/McNemar) to enhance the academic rigor of algorithm comparisons.
+4. Integrate SUS questionnaire pages and automated result aggregation (directly supporting the usability analysis chapter of the thesis).
+5. Establish a unified `config` configuration system to improve system decoupling and portability.
 
 ---
 
@@ -269,15 +269,15 @@ py -m streamlit run app.py --server.port 8507 --server.address localhost
 
 ## 12. Post-Demo ToDo (Roadmap after Wednesday)
 
-### 12.1 Before Wednesday Demo (Must Finish)
+### 12.1 Core Functional Refinement and System Demonstration Preparation
 
 - [ ] **Unify Experimental Protocol**: Use `8:2 split + 5-fold CV` for all 3 datasets (cardio70k current results are 3-fold, need to rerun 5-fold version).
 - [ ] **Main Results Table**: Organize a master table of `dataset × model` (Accuracy/F1/Recall/ROC-AUC/PR-AUC).
 - [ ] **SHAP Gallery**: Prepare at least 1 global plot (bar) + 1 local plot (waterfall) per dataset.
-- [ ] **Demo Script**: Fix 1 set of manual inputs + 1 batch CSV example for a stable 3-minute demo.
-- [ ] **Risk Statement**: Prepare explanations for "different task definitions across datasets" to avoid challenges on cross-dataset comparability during defense.
+- [ ] **Demo Script**: Fix 1 set of manual inputs + 1 batch CSV example for a stable and smooth demonstration.
+- [ ] **Technical Justification**: Prepare technical explanations for "different task definitions across datasets" to ensure logical consistency of the experimental design.
 
-### 12.2 Phase 1 Post-Demo (Experimental Enhancement)
+### 12.2 System Optimization Phase 1 (Experimental Enhancement)
 
 - [ ] **Class Imbalance Strategy Comparison**: Comparative experiments on class_weight / threshold optimization / (Optional) SMOTE.
 - [ ] **Model Calibration**: Include Brier Score + calibration curve to enhance clinical usability arguments.
@@ -285,7 +285,7 @@ py -m streamlit run app.py --server.port 8507 --server.address localhost
 - [ ] **Complexity Analysis**: Output training time, inference time, and model size (evidence for deployment cost).
 - [ ] **Reproducibility**: Fix random seeds, record environment versions, and unify result export naming rules.
 
-### 12.3 Phase 2 Post-Demo (System Enhancement)
+### 12.3 System Optimization Phase 2 (System Enhancement)
 
 - [ ] **Multi-model Side-by-Side Comparison**: Display risk probabilities for 5 models side-by-side for the same patient input.
 - [ ] **Batch High-Risk Screening**: Sort by risk after batch prediction and export Top-N high-risk list.
@@ -293,7 +293,7 @@ py -m streamlit run app.py --server.port 8507 --server.address localhost
 - [ ] **Log Management Page**: Filter, view, and export historical prediction logs within the system.
 - [ ] **Input Validation**: Add rule-based validation for key fields (range, required, logical relations).
 
-### 12.4 Thesis and Defense Enhancement (Bonus Points)
+### 12.4 Enhancing Thesis Depth and Defense Argumentation
 
 - [ ] **Methods Chapter Supplement**: Clearly define the boundary of "intra-dataset comparison, no cross-task combined training".
 - [ ] **Results Chapter Supplement**: Include failure/misclassification case analysis (using SHAP).
