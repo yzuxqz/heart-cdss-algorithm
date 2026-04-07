@@ -1,0 +1,66 @@
+{
+  "dataset": "uci_cleveland",
+  "csv_path": "heart_disease_uci.csv",
+  "target": "num",
+  "model": "xgb",
+  "best_params": {
+    "model__subsample": 0.85,
+    "model__reg_lambda": 2.0,
+    "model__n_estimators": 300,
+    "model__min_child_weight": 10,
+    "model__max_depth": 4,
+    "model__learning_rate": 0.03,
+    "model__colsample_bytree": 0.7
+  },
+  "cv_best_score_roc_auc": 0.9016539418713332,
+  "test_metrics": {
+    "accuracy": 0.8852459016393442,
+    "precision": 0.8620689655172413,
+    "recall": 0.8928571428571429,
+    "f1": 0.8771929824561403,
+    "roc_auc": 0.9653679653679654,
+    "pr_auc": 0.9626405680894384,
+    "confusion_matrix": [
+      [
+        29,
+        4
+      ],
+      [
+        3,
+        25
+      ]
+    ]
+  },
+  "n_train": 243,
+  "n_test": 61,
+  "cv_folds": 5,
+  "n_iter": 10,
+  "shap": false,
+  "shap_paths": {},
+  "run_id": "20260407_232426",
+  "_field_doc": {
+    "dataset": "数据集代号（results/<dataset>/）",
+    "csv_path": "本次实验使用的原始CSV路径（记录用）",
+    "target": "目标列名（标签列）",
+    "model": "模型简称：logreg/rf/xgb/lgbm/cat",
+    "best_params": "随机搜索(RandomizedSearchCV)选出的最优超参数。因为模型在Pipeline里叫 model，所以键名前缀为 model__",
+    "cv_best_score_roc_auc": "交叉验证阶段(best_score_)的ROC-AUC（scoring=roc_auc），越大越好",
+    "test_metrics": {
+      "accuracy": "测试集准确率",
+      "precision": "测试集精确率",
+      "recall": "测试集召回率",
+      "f1": "测试集F1",
+      "roc_auc": "测试集ROC-AUC（用预测分数 y_score 计算）",
+      "pr_auc": "测试集PR-AUC（Precision-Recall曲线下面积）",
+      "confusion_matrix": "混淆矩阵 [[TN, FP], [FN, TP]]（基于阈值0.5的预测类别 y_pred）"
+    },
+    "n_train": "训练集样本数",
+    "n_test": "测试集样本数",
+    "cv_folds": "交叉验证折数（如存在）",
+    "n_iter": "超参数随机搜索迭代次数（如存在）",
+    "shap": "是否启用SHAP解释（如存在）",
+    "shap_paths": "SHAP输出图片路径字典（如存在）",
+    "run_id": "本次实验run编号（同一run_id下会生成summary.csv和每个模型的json）",
+    "_field_doc": "字段含义说明（本字典）"
+  }
+}
