@@ -78,6 +78,99 @@ def _select_positive_class_if_needed(explanation: Any) -> Any:
     return explanation
 
 
+def _safe_corr(x: np.ndarray, y: np.ndarray) -> float | None:
+    x = np.asarray(x).ravel()
+    y = np.asarray(y).ravel()
+    if x.size != y.size or x.size < 3:
+        return None
+    if float(np.nanstd(x)) == 0.0 or float(np.nanstd(y)) == 0.0:
+        return None
+    c = float(np.corrcoef(x, y)[0, 1])
+    if np.isnan(c):
+        return None
+    return c
+
+
+def _direction_hint(corr: float | None) -> str:
+    if corr is None:
+        return "方向不稳定/数据不足"
+    if corr >= 0.15:
+        return "值越大 → 风险更高"
+    if corr <= -0.15:
+        return "值越大 → 风险更低"
+    return "方向弱/可能非线性"
+
+
+def _format_float(x: Any, nd: int = 4) -> str:
+    try:
+        v = float(x)
+    except Exception:
+        return "NA"
+    if np.isnan(v):
+        return "NA"
+    return f"{v:.{nd}f}"
+
+
+def _top_global_feature_table(
+    *,
+    shap_values: np.ndarray,
+    X_values: np.ndarray,
+    feature_names: list[str],
+    top_k: int = 10,
+) -> list[tuple[str, float, str]]:
+    if shap_values.ndim != 2:
+        return []
+    mean_abs = np.nanmean(np.abs(shap_values), axis=0)
+    order = np.argsort(-mean_abs)[: int(top_k)]
+    rows: list[tuple[str, float, str]] = []
+    for i in order.tolist():
+        name = feature_names[i] if 0 <= i < len(feature_names) else f"feature_{i}"
+        corr = _safe_corr(X_values[:, i], shap_values[:, i])
+        rows.append((str(name), float(mean_abs[i]), _direction_hint(corr)))
+    return rows
+
+
+def _local_feature_table(
+    *,
+    shap_row: np.ndarray,
+    X_row: np.ndarray,
+    feature_names: list[str],
+    top_k: int = 8,
+) -> tuple[list[tuple[str, float, float]], list[tuple[str, float, float]]]:
+    shap_row = np.asarray(shap_row).ravel()
+    X_row = np.asarray(X_row).ravel()
+    idx = np.argsort(-np.abs(shap_row))[: int(top_k)]
+    pos: list[tuple[str, float, float]] = []
+    neg: list[tuple[str, float, float]] = []
+    for i in idx.tolist():
+        name = feature_names[i] if 0 <= i < len(feature_names) else f"feature_{i}"
+        sv = float(shap_row[i])
+        xv = float(X_row[i]) if i < X_row.size else float("nan")
+        if sv >= 0:
+            pos.append((str(name), xv, sv))
+        else:
+            neg.append((str(name), xv, sv))
+    pos.sort(key=lambda t: -abs(t[2]))
+    neg.sort(key=lambda t: -abs(t[2]))
+    return pos, neg
+
+
+def _attach_explanation_panel(
+    *,
+    fig: Any,
+    title: str,
+    body_lines: list[str],
+    footer_lines: list[str] | None = None,
+    bottom_space: float = 0.22,
+) -> None:
+    footer_lines = footer_lines or []
+    fig.set_size_inches(12, 7.6)
+    fig.suptitle(title, x=0.01, ha="left", fontsize=13, fontweight="bold")
+    fig.subplots_adjust(bottom=float(bottom_space), top=0.90)
+    text = "\n".join(body_lines + ([""] if footer_lines else []) + footer_lines)
+    fig.text(0.01, 0.01, text, ha="left", va="bottom", fontsize=9)
+
+
 def generate_shap_outputs(
     *,
     pipeline: Any,
@@ -110,6 +203,8 @@ def generate_shap_outputs(
     # 使用 Agg 后端，无需 GUI 即可保存图片 / Use Agg backend for headless image saving
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "Arial Unicode MS", "DejaVu Sans"]
+    plt.rcParams["axes.unicode_minus"] = False
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -133,7 +228,35 @@ def generate_shap_outputs(
     beeswarm_path = out_dir / f"{file_prefix}_shap_beeswarm.png"
     plt.figure()
     shap.plots.beeswarm(explanation, show=False, max_display=30)
-    plt.tight_layout()
+    fig = plt.gcf()
+    shap_vals = np.asarray(getattr(explanation, "values", np.asarray([])))
+    global_rows = _top_global_feature_table(
+        shap_values=shap_vals,
+        X_values=X_ex_t,
+        feature_names=feature_names,
+        top_k=10,
+    )
+    body = [
+        "阅读指南（Beeswarm）：每个点=一个样本；横轴=SHAP 值（对模型输出的边际贡献）。",
+        "SHAP > 0 推高阳性(高风险)倾向；SHAP < 0 拉低阳性(低风险)倾向。",
+        "颜色表示特征值大小（红=高，蓝=低）。点分布越“宽”，说明不同人群影响差异越大。",
+        "",
+        "Top 重要特征（按 mean|SHAP| 排序，附方向提示）：",
+    ]
+    for name, mean_abs, hint in global_rows:
+        body.append(f"- {name}: mean|SHAP|={_format_float(mean_abs)}；{hint}")
+    footer = [
+        "注意：不同模型的 SHAP 单位可能不同（概率/对数几率/原始分数）。跨模型建议主要比较“排序”而不是数值大小。",
+        "方向提示来自“特征值 vs SHAP 值”的线性相关，仅用于辅助理解（非因果）。",
+    ]
+    _attach_explanation_panel(
+        fig=fig,
+        title=f"SHAP Beeswarm • {file_prefix}",
+        body_lines=body,
+        footer_lines=footer,
+        bottom_space=0.27,
+    )
+    plt.tight_layout(rect=[0, 0.18, 1, 0.93])
     plt.savefig(beeswarm_path, dpi=200)
     plt.close()
     paths["beeswarm"] = str(beeswarm_path)
@@ -142,7 +265,26 @@ def generate_shap_outputs(
     bar_path = out_dir / f"{file_prefix}_shap_bar.png"
     plt.figure()
     shap.plots.bar(explanation, show=False, max_display=30)
-    plt.tight_layout()
+    fig = plt.gcf()
+    body = [
+        "阅读指南（Bar）：条形长度=mean(|SHAP|)，表示该特征对预测的平均影响强度（越大越重要）。",
+        "这是“重要性”而不是“风险方向”；方向需要结合 Beeswarm/Dependence 来看。",
+        "",
+        "Top 重要特征（含方向提示，便于快速汇报/写论文）：",
+    ]
+    for name, mean_abs, hint in global_rows:
+        body.append(f"- {name}: mean|SHAP|={_format_float(mean_abs)}；{hint}")
+    footer = [
+        "建议写作表述：用 Bar 给出重要性排序，用 Beeswarm 展示分布与高低值对风险的推动/抑制趋势。",
+    ]
+    _attach_explanation_panel(
+        fig=fig,
+        title=f"SHAP Global Importance • {file_prefix}",
+        body_lines=body,
+        footer_lines=footer,
+        bottom_space=0.26,
+    )
+    plt.tight_layout(rect=[0, 0.17, 1, 0.93])
     plt.savefig(bar_path, dpi=200)
     plt.close()
     paths["bar"] = str(bar_path)
@@ -152,7 +294,50 @@ def generate_shap_outputs(
         local_path = out_dir / f"{file_prefix}_shap_waterfall_{local_index}.png"
         plt.figure()
         shap.plots.waterfall(explanation[local_index], show=False, max_display=30)
-        plt.tight_layout()
+        fig = plt.gcf()
+        try:
+            proba = None
+            if hasattr(pipeline, "predict_proba"):
+                proba = float(pipeline.predict_proba(X_explain)[local_index, 1])
+        except Exception:
+            proba = None
+        shap_row = np.asarray(getattr(explanation[local_index], "values", np.asarray([])))
+        pos, neg = _local_feature_table(
+            shap_row=shap_row,
+            X_row=X_ex_t[local_index],
+            feature_names=feature_names,
+            top_k=10,
+        )
+        body = [
+            "阅读指南（Waterfall）：从基线(base value)出发，逐项叠加每个特征的 SHAP 贡献，得到最终输出。",
+            "红色(正贡献)把预测推向高风险；蓝色(负贡献)把预测拉向低风险。",
+        ]
+        if proba is not None:
+            body.append(f"该样本预测风险概率：{_format_float(proba)}（模型输出可能与 SHAP 计算单位不同，仅做参考）")
+        body.append("")
+        body.append("主要正向驱动（推高风险）：")
+        if pos:
+            for name, xv, sv in pos[:6]:
+                body.append(f"- {name}: value={_format_float(xv)}；SHAP={_format_float(sv)}")
+        else:
+            body.append("- 无明显正向驱动项（或已被截断）")
+        body.append("主要负向抑制（降低风险）：")
+        if neg:
+            for name, xv, sv in neg[:6]:
+                body.append(f"- {name}: value={_format_float(xv)}；SHAP={_format_float(sv)}")
+        else:
+            body.append("- 无明显负向抑制项（或已被截断）")
+        footer = [
+            "提示：若出现 one-hot 特征（如 xxx=1），说明该类别取值对预测有显著影响。",
+        ]
+        _attach_explanation_panel(
+            fig=fig,
+            title=f"SHAP Local Explanation • {file_prefix} • index={local_index}",
+            body_lines=body,
+            footer_lines=footer,
+            bottom_space=0.33,
+        )
+        plt.tight_layout(rect=[0, 0.22, 1, 0.93])
         plt.savefig(local_path, dpi=200)
         plt.close()
         paths["waterfall"] = str(local_path)
