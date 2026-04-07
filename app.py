@@ -1,19 +1,5 @@
 from __future__ import annotations
 
-"""
-Streamlit Web 应用主入口 / Streamlit Web Application Main Entry
-
-中文：
-- 提供多数据集的心脏病临床决策支持系统界面
-- 支持单样本预测、批量预测、模型对比、SHAP 解释和 PDF 报告导出
-- 集成了多个心脏病数据集（UCI, Framingham, Cardio70k）
-
-English:
-- Provides a Streamlit UI for the Multi-Dataset Heart Disease CDSS
-- Supports single/batch prediction, model comparison, SHAP explanations, and PDF reports
-- Integrates multiple heart disease datasets (UCI, Framingham, Cardio70k)
-"""
-
 from pathlib import Path
 
 import numpy as np
@@ -711,10 +697,6 @@ def main() -> None:
     st.set_page_config(page_title="Heart CDSS", layout="wide")
     _inject_branding()
     st.markdown('<div class="hc-title">Heart CDSS • Multi-Dataset • XAI</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="hc-subtitle">Interactive clinical decision support with SHAP explainability.</div>',
-        unsafe_allow_html=True,
-    )
 
     dataset_label = st.sidebar.selectbox("Dataset", list(DATASETS.keys()))
     dataset_code = DATASETS[dataset_label]
