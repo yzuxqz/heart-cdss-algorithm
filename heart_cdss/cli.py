@@ -31,6 +31,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--csv", required=True, help="CSV 文件路径 / Path to CSV file")
     p.add_argument("--target", default=None, help="目标列名 / Target column name")
+    p.add_argument(
+        "--models",
+        default=None,
+        help="只跑指定模型(逗号分隔)：logreg,rf,xgb,lgbm,cat / Limit models (comma-separated)",
+    )
+    p.add_argument(
+        "--max-rows",
+        type=int,
+        default=0,
+        help="限制最多使用多少行数据(0=不限制) / Max rows to sample (0=no limit)",
+    )
     p.add_argument("--test-size", type=float, default=0.2, help="测试集比例 / Test set ratio")
     p.add_argument("--seed", type=int, default=42, help="随机种子 / Random seed")
     p.add_argument("--n-iter", type=int, default=25, help="超参数搜索迭代次数 / Hyperparameter search iterations")
@@ -48,6 +59,10 @@ def main(argv: list[str] | None = None) -> None:
     """
     p = build_parser()
     ns = p.parse_args(argv)
+    models = None
+    if ns.models:
+        models = tuple([m.strip() for m in str(ns.models).split(",") if m.strip()])
+    max_rows = int(ns.max_rows) if int(ns.max_rows) > 0 else None
 
     # 启动实验 / Start the experiment
     summary_path = run_experiment(
@@ -55,6 +70,8 @@ def main(argv: list[str] | None = None) -> None:
             dataset=ns.dataset,
             csv_path=Path(ns.csv),
             target=ns.target,
+            models=models,
+            max_rows=max_rows,
             test_size=ns.test_size,
             seed=ns.seed,
             n_iter=ns.n_iter,

@@ -174,6 +174,8 @@ class RunArgs:
     dataset: str
     csv_path: Path
     target: str | None
+    models: tuple[str, ...] | None
+    max_rows: int | None
     test_size: float
     seed: int
     n_iter: int
@@ -201,6 +203,8 @@ def run_experiment(args: RunArgs) -> Path:
     - Saves detailed results to JSON and summary to CSV
     """
     df = read_csv_auto(args.csv_path)
+    if args.max_rows and len(df) > int(args.max_rows):
+        df = df.sample(n=int(args.max_rows), random_state=args.seed).reset_index(drop=True)
     target_col = args.target or infer_target_column(df.columns.tolist())
     X, y = prepare_dataset(df, args.dataset, target_col)
 
@@ -215,6 +219,11 @@ def run_experiment(args: RunArgs) -> Path:
 
     preprocessor = build_preprocessor(X_train)
     models = get_models_and_spaces(args.seed)
+    if args.models:
+        requested = {m.strip() for m in args.models if m.strip()}
+        models = {k: v for k, v in models.items() if k in requested}
+        if not models:
+            raise ValueError(f"未找到可用模型 / No requested models available: {sorted(requested)}")
 
     # 结果保存路径 / Output directory
     out_dir = Path(__file__).resolve().parent.parent / "results" / args.dataset
