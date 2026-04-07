@@ -28,6 +28,7 @@ ENV/
 
 # Project Specific
 # (Removed restrictions on datasets and results to allow full upload)
+.tmp/
 logs/
 catboost_info/
 

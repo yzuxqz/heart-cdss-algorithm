@@ -1,0 +1,27 @@
+{
+  "dataset": "framingham",
+  "csv_path": "D:\\heart-cdss-algorithm\\framingham.csv",
+  "target": "TenYearCHD",
+  "run_id": "20260407_234017",
+  "model": "logreg",
+  "best_params": {
+    "C": 0.05
+  },
+  "row": {
+    "run_id": "20260407_234017",
+    "dataset": "framingham",
+    "model": "logreg",
+    "cv_roc_auc": 0.729784236804312,
+    "test_accuracy": 0.6674528301886793,
+    "test_precision": 0.2524271844660194,
+    "test_recall": 0.6046511627906976,
+    "test_f1": 0.3561643835616438,
+    "test_roc_auc": 0.7004560597729405,
+    "test_pr_auc": 0.3006329399975536,
+    "n_train": 3392,
+    "n_test": 848,
+    "cv_folds": 3,
+    "n_iter": 6,
+    "shap": false
+  }
+}

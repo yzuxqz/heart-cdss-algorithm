@@ -1,0 +1,84 @@
+{
+  "columns": [
+    {
+      "name": "age",
+      "type": "numeric",
+      "min": 10798.0,
+      "max": 23713.0
+    },
+    {
+      "name": "gender",
+      "type": "categorical",
+      "categories": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "name": "height",
+      "type": "numeric",
+      "min": 55.0,
+      "max": 250.0
+    },
+    {
+      "name": "weight",
+      "type": "numeric",
+      "min": 10.0,
+      "max": 200.0
+    },
+    {
+      "name": "ap_hi",
+      "type": "numeric",
+      "min": -150.0,
+      "max": 16020.0
+    },
+    {
+      "name": "ap_lo",
+      "type": "numeric",
+      "min": -70.0,
+      "max": 11000.0
+    },
+    {
+      "name": "cholesterol",
+      "type": "categorical",
+      "categories": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "name": "gluc",
+      "type": "categorical",
+      "categories": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "name": "smoke",
+      "type": "categorical",
+      "categories": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "alco",
+      "type": "categorical",
+      "categories": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "active",
+      "type": "categorical",
+      "categories": [
+        "0",
+        "1"
+      ]
+    }
+  ]
+}

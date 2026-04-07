@@ -289,7 +289,144 @@ def generate_shap_outputs(
     plt.close()
     paths["bar"] = str(bar_path)
 
-    # 3. 局部瀑布图 / Local waterfall plot
+    # 3. 全局热力图 / Global heatmap
+    try:
+        heatmap_path = out_dir / f"{file_prefix}_shap_heatmap.png"
+        plt.figure()
+        shap.plots.heatmap(explanation, show=False, max_display=30)
+        plt.tight_layout()
+        plt.savefig(heatmap_path, dpi=200)
+        plt.close()
+        paths["heatmap"] = str(heatmap_path)
+    except Exception:
+        pass
+
+    # 4. 全局决策图 / Global decision plot
+    try:
+        values = np.asarray(getattr(explanation, "values", np.asarray([])))
+        base_values = np.asarray(getattr(explanation, "base_values", np.asarray([0.0])))
+        if values.ndim == 2 and values.shape[0] > 0:
+            decision_path = out_dir / f"{file_prefix}_shap_decision.png"
+            base = float(np.nanmean(base_values)) if base_values.size > 0 else 0.0
+            plt.figure(figsize=(12, 7))
+            shap.decision_plot(
+                base_value=base,
+                shap_values=values,
+                features=X_ex_t,
+                feature_names=feature_names,
+                show=False,
+                ignore_warnings=True,
+            )
+            plt.tight_layout()
+            plt.savefig(decision_path, dpi=200)
+            plt.close()
+            paths["decision"] = str(decision_path)
+    except Exception:
+        pass
+
+    # 5. 依赖图（Top 特征）/ Dependence plot (top feature)
+    try:
+        dep_rows = _top_global_feature_table(
+            shap_values=np.asarray(getattr(explanation, "values", np.asarray([]))),
+            X_values=X_ex_t,
+            feature_names=feature_names,
+            top_k=2,
+        )
+        if dep_rows:
+            dep_name = dep_rows[0][0]
+            dep_path = out_dir / f"{file_prefix}_shap_dependence_top1.png"
+            plt.figure(figsize=(9, 6))
+            shap.plots.scatter(explanation[:, dep_name], color=explanation, show=False)
+            plt.tight_layout()
+            plt.savefig(dep_path, dpi=200)
+            plt.close()
+            paths["dependence_top1"] = str(dep_path)
+    except Exception:
+        pass
+
+    # 6. 交互图（Top1 by Top2 color）/ Interaction-like scatter
+    try:
+        dep_rows = _top_global_feature_table(
+            shap_values=np.asarray(getattr(explanation, "values", np.asarray([]))),
+            X_values=X_ex_t,
+            feature_names=feature_names,
+            top_k=2,
+        )
+        if len(dep_rows) >= 2:
+            f1 = dep_rows[0][0]
+            f2 = dep_rows[1][0]
+            inter_path = out_dir / f"{file_prefix}_shap_interaction_top1_top2.png"
+            plt.figure(figsize=(9, 6))
+            shap.plots.scatter(explanation[:, f1], color=explanation[:, f2], show=False)
+            plt.tight_layout()
+            plt.savefig(inter_path, dpi=200)
+            plt.close()
+            paths["interaction_top1_top2"] = str(inter_path)
+    except Exception:
+        pass
+
+    # 7. 交互式 HTML（dependence / interaction）/ Interactive HTML plots
+    try:
+        import pandas as pd
+        import plotly.express as px
+
+        dep_rows = _top_global_feature_table(
+            shap_values=np.asarray(getattr(explanation, "values", np.asarray([]))),
+            X_values=X_ex_t,
+            feature_names=feature_names,
+            top_k=2,
+        )
+        if dep_rows:
+            top1 = dep_rows[0][0]
+            idx1 = feature_names.index(top1) if top1 in feature_names else 0
+            df_dep = pd.DataFrame(
+                {
+                    "feature_value": X_ex_t[:, idx1],
+                    "shap_value": np.asarray(getattr(explanation, "values", np.asarray([])))[:, idx1],
+                }
+            )
+            dep_html_path = out_dir / f"{file_prefix}_shap_dependence_top1_interactive.html"
+            fig_dep = px.scatter(
+                df_dep,
+                x="feature_value",
+                y="shap_value",
+                title=f"SHAP Dependence (interactive): {top1}",
+                opacity=0.75,
+            )
+            fig_dep.update_layout(template="plotly_white", height=520)
+            fig_dep.write_html(dep_html_path, include_plotlyjs="cdn")
+            paths["dependence_top1_html"] = str(dep_html_path)
+
+        if len(dep_rows) >= 2:
+            top1 = dep_rows[0][0]
+            top2 = dep_rows[1][0]
+            idx1 = feature_names.index(top1) if top1 in feature_names else 0
+            idx2 = feature_names.index(top2) if top2 in feature_names else 1
+            values_arr = np.asarray(getattr(explanation, "values", np.asarray([])))
+            df_inter = pd.DataFrame(
+                {
+                    "feature_top1_value": X_ex_t[:, idx1],
+                    "shap_top1_value": values_arr[:, idx1],
+                    "feature_top2_value": X_ex_t[:, idx2],
+                }
+            )
+            inter_html_path = out_dir / f"{file_prefix}_shap_interaction_top1_top2_interactive.html"
+            fig_inter = px.scatter(
+                df_inter,
+                x="feature_top1_value",
+                y="shap_top1_value",
+                color="feature_top2_value",
+                title=f"SHAP Interaction-like (interactive): {top1} colored by {top2}",
+                opacity=0.75,
+                color_continuous_scale="Viridis",
+            )
+            fig_inter.update_layout(template="plotly_white", height=520)
+            fig_inter.write_html(inter_html_path, include_plotlyjs="cdn")
+            paths["interaction_top1_top2_html"] = str(inter_html_path)
+    except Exception:
+        pass
+
+    # 8. 局部瀑布图 / Local waterfall plot
     if 0 <= local_index < len(X_ex_t):
         local_path = out_dir / f"{file_prefix}_shap_waterfall_{local_index}.png"
         plt.figure()
@@ -341,5 +478,41 @@ def generate_shap_outputs(
         plt.savefig(local_path, dpi=200)
         plt.close()
         paths["waterfall"] = str(local_path)
+
+        # 9. 局部 Force 图 / Local force plot
+        try:
+            force_path = out_dir / f"{file_prefix}_shap_force_{local_index}.png"
+            plt.figure(figsize=(12, 3))
+            local_exp = explanation[local_index]
+            shap.force_plot(
+                base_value=getattr(local_exp, "base_values", 0.0),
+                shap_values=getattr(local_exp, "values", np.asarray([])),
+                features=getattr(local_exp, "data", None),
+                feature_names=feature_names,
+                matplotlib=True,
+                show=False,
+            )
+            plt.tight_layout()
+            plt.savefig(force_path, dpi=200)
+            plt.close()
+            paths["force"] = str(force_path)
+        except Exception:
+            pass
+
+        # 10. 局部 Force 交互 HTML / Local interactive force plot
+        try:
+            local_exp = explanation[local_index]
+            force_html_path = out_dir / f"{file_prefix}_shap_force_{local_index}_interactive.html"
+            force_obj = shap.force_plot(
+                base_value=getattr(local_exp, "base_values", 0.0),
+                shap_values=getattr(local_exp, "values", np.asarray([])),
+                features=getattr(local_exp, "data", None),
+                feature_names=feature_names,
+                matplotlib=False,
+            )
+            shap.save_html(str(force_html_path), force_obj)
+            paths["force_html"] = str(force_html_path)
+        except Exception:
+            pass
 
     return paths

@@ -1,10 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 from heart_cdss.data import read_csv_auto
 from heart_cdss.explain import generate_shap_outputs
@@ -50,10 +51,9 @@ def _artifact_dir(dataset_code: str) -> Path:
 @st.cache_resource
 def _load_model_and_schema(dataset_code: str):
     """
-    加载模型、数据架构和元数据 / Load model, schema, and metadata.
+    鍔犺浇妯″瀷銆佹暟鎹灦鏋勫拰鍏冩暟鎹?/ Load model, schema, and metadata.
 
-    中文：从 artifacts 目录加载已训练的 Joblib 模型、JSON 架构和元数据。
-    English: Loads trained Joblib model, JSON schema, and meta from artifacts directory.
+    涓枃锛氫粠 artifacts 鐩綍鍔犺浇宸茶缁冪殑 Joblib 妯″瀷銆丣SON 鏋舵瀯鍜屽厓鏁版嵁銆?    English: Loads trained Joblib model, JSON schema, and meta from artifacts directory.
     """
     ad = _artifact_dir(dataset_code)
     model_path = ad / "model.joblib"
@@ -97,8 +97,8 @@ def _inject_branding() -> None:
             radial-gradient(900px 500px at 90% 90%, rgba(244, 114, 182, 0.10), transparent 55%),
             linear-gradient(180deg, rgba(3, 7, 18, 1), rgba(2, 6, 23, 1));
         }
-        header, footer { visibility: hidden; }
-        .block-container { padding-top: 1.2rem; }
+        footer { visibility: hidden; }
+        .block-container { padding-top: 4.5rem; }
         .hc-title {
           font-weight: 800;
           letter-spacing: -0.02em;
@@ -183,10 +183,9 @@ def _risk_label(p: float, threshold: float) -> str:
 
 def _render_risk_meter(proba: float, threshold: float) -> None:
     """
-    渲染风险度量表 / Render risk risk meter UI.
+    娓叉煋椋庨櫓搴﹂噺琛?/ Render risk risk meter UI.
 
-    中文：在 Streamlit 中显示决策阈值、当前风险得分及彩色风险条。
-    English: Displays decision threshold, risk score, and color-coded risk meter in Streamlit.
+    涓枃锛氬湪 Streamlit 涓樉绀哄喅绛栭槇鍊笺€佸綋鍓嶉闄╁緱鍒嗗強褰╄壊椋庨櫓鏉°€?    English: Displays decision threshold, risk score, and color-coded risk meter in Streamlit.
     """
     label = _risk_label(proba, threshold)
     pct = int(round(min(max(proba, 0.0), 1.0) * 100))
@@ -197,7 +196,7 @@ def _render_risk_meter(proba: float, threshold: float) -> None:
           <div class="hc-badge">Decision: {label}</div>
           <div class="hc-metric">{proba:.4f}</div>
           <div class="hc-meter"><div style="width:{pct}%;"></div></div>
-          <div class="hc-note">Risk probability scale (0 → 1). You can adjust the threshold in the sidebar.</div>
+          <div class="hc-note">Risk probability scale (0 鈫?1). You can adjust the threshold in the sidebar.</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -354,7 +353,7 @@ def _render_shap_gallery(dataset_code: str) -> None:
     imgs = _list_shap_images(dataset_code)
     st.write("SHAP image folder:", str(_results_dir(dataset_code)))
     if not imgs:
-        st.info("当前还没有 SHAP 图片。你可以在本页点击按钮生成（Local / Global）。")
+        st.info("No SHAP images yet. Please click SHAP generation buttons (Local / Global).")
         return
 
     cols = st.columns(3)
@@ -367,6 +366,28 @@ def _render_shap_gallery(dataset_code: str) -> None:
                 file_name=p.name,
                 key=f"dl_{dataset_code}_{p.name}",
             )
+
+
+def _list_shap_html(dataset_code: str) -> list[Path]:
+    rd = _results_dir(dataset_code)
+    return sorted(rd.glob("**/*shap*interactive*.html"), key=lambda p: p.name, reverse=True)
+
+
+def _render_shap_html_gallery(dataset_code: str, *, key_prefix: str = "xai") -> None:
+    htmls = _list_shap_html(dataset_code)
+    if not htmls:
+        st.info("No interactive SHAP HTML yet. Generate SHAP first.")
+        return
+    for i, p in enumerate(htmls[:8]):
+        st.markdown(f"**{p.name}**")
+        components.html(p.read_text(encoding="utf-8", errors="ignore"), height=560, scrolling=True)
+        key_safe = f"{dataset_code}_{i}_{p.parent.name}_{p.name}"
+        st.download_button(
+            label="Download HTML",
+            data=p.read_bytes(),
+            file_name=p.name,
+            key=f"dl_html_{key_prefix}_{key_safe}",
+        )
 
 
 def _model_for_explain(dataset_code: str, meta: dict, model_name: str | None, fallback_model):
@@ -382,12 +403,12 @@ def _model_for_explain(dataset_code: str, meta: dict, model_name: str | None, fa
 
     _inject_branding()
 
-    st.markdown('<div class="hc-title">Heart CDSS • Multi-Dataset • XAI</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hc-title">Heart CDSS - Multi-Dataset - XAI</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="hc-subtitle">A clinical-style decision support prototype: multi-dataset benchmarking, deployment-ready pipelines, SHAP explanations, batch scoring, and report export.</div>',
         unsafe_allow_html=True,
     )
-    st.set_page_config(page_title="Heart CDSS", layout="wide")
+    st.set_page_config(page_title="Heart CDSS", layout="wide", initial_sidebar_state="expanded")
     st.title("Clinical Decision Support System (Multi-Dataset)")
     dataset_label = st.sidebar.selectbox("Dataset", list(DATASETS.keys()))
     dataset_code = DATASETS[dataset_label]
@@ -396,7 +417,7 @@ def _model_for_explain(dataset_code: str, meta: dict, model_name: str | None, fa
 
     model, schema, meta = _load_model_and_schema(dataset_code)
     if model is None:
-        st.error("未找到已训练模型。请先运行：py build_system_artifacts.py")
+        st.error("鏈壘鍒板凡璁粌妯″瀷銆傝鍏堣繍琛岋細py build_system_artifacts.py")
         return
     _render_model_card(meta, dataset_code)
 
@@ -500,11 +521,11 @@ def _model_for_explain(dataset_code: str, meta: dict, model_name: str | None, fa
             required = _schema_columns(schema)
             missing = [c for c in required if c not in df_up.columns]
             if missing:
-                st.error(f"缺少列: {missing[:10]}{'...' if len(missing) > 10 else ''}")
+                st.error(f"缂哄皯鍒? {missing[:10]}{'...' if len(missing) > 10 else ''}")
             else:
                 df_in = df_up[required].copy()
                 if dataset_code == "cardio70k" and "age" in df_in.columns:
-                    st.info("Cardio70k 的 age 需要是 days（与原数据一致）。如果你上传的是 years，请先转换。")
+                    st.info("Cardio70k 的 age 需要是 days（与原始数据一致）。如果你上传的是 years，请先转换。")
                 limit = st.number_input("Max rows to score", min_value=10, max_value=5000, value=500, step=10)
                 df_in = df_in.head(int(limit))
                 if st.button("Run Batch Prediction"):
@@ -530,7 +551,7 @@ def _model_for_explain(dataset_code: str, meta: dict, model_name: str | None, fa
                     local_index=0,
                 )
                 if not paths:
-                    st.error("SHAP 未安装或生成失败")
+                    st.error("SHAP 鏈畨瑁呮垨鐢熸垚澶辫触")
                 else:
                     st.image(paths.get("waterfall"), caption="Waterfall", use_container_width=True)
 
@@ -694,9 +715,9 @@ def _model_for_explain(dataset_code: str, meta: dict, model_name: str | None, fa
                 st.success(f"Generated: {pdf_path}")
                 st.download_button("Download PDF", data=pdf_path.read_bytes(), file_name=pdf_path.name)
 def main() -> None:
-    st.set_page_config(page_title="Heart CDSS", layout="wide")
+    st.set_page_config(page_title="Heart CDSS", layout="wide", initial_sidebar_state="expanded")
     _inject_branding()
-    st.markdown('<div class="hc-title">Heart CDSS • Multi-Dataset • XAI</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hc-title">Heart CDSS - Multi-Dataset - XAI</div>', unsafe_allow_html=True)
 
     dataset_label = st.sidebar.selectbox("Dataset", list(DATASETS.keys()))
     dataset_code = DATASETS[dataset_label]
@@ -706,11 +727,11 @@ def main() -> None:
 
     model, schema, meta = _load_model_and_schema(dataset_code)
     if model is None:
-        st.error("未找到模型文件，请先运行: py build_system_artifacts.py")
+        st.error("鏈壘鍒版ā鍨嬫枃浠讹紝璇峰厛杩愯: py build_system_artifacts.py")
         return
 
     _render_model_card(meta, dataset_code)
-    tab_predict, tab_xai = st.tabs(["Predict", "Explainability"])
+    tab_predict, tab_xai, tab_xai_interactive = st.tabs(["Predict", "Explainability", "Interactive SHAP"])
 
     with tab_predict:
         st.subheader("Single Patient Prediction")
@@ -777,6 +798,13 @@ def main() -> None:
 
         st.divider()
         _render_shap_gallery(dataset_code)
+        st.subheader("Interactive SHAP Gallery (saved HTML)")
+        _render_shap_html_gallery(dataset_code, key_prefix="tab_xai")
+
+    with tab_xai_interactive:
+        st.subheader("Interactive SHAP")
+        st.write("This tab shows interactive SHAP HTML charts (zoom / hover / pan).")
+        _render_shap_html_gallery(dataset_code, key_prefix="tab_xai_interactive")
 
 
 if __name__ == "__main__":
