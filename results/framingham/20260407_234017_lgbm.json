@@ -2,32 +2,32 @@
   "dataset": "framingham",
   "csv_path": "framingham.csv",
   "target": "TenYearCHD",
-  "model": "xgb",
+  "model": "lgbm",
   "best_params": {
     "model__subsample": 0.7,
-    "model__reg_lambda": 2.0,
-    "model__n_estimators": 600,
-    "model__min_child_weight": 5,
-    "model__max_depth": 4,
+    "model__reg_lambda": 0.0,
+    "model__num_leaves": 127,
+    "model__n_estimators": 500,
+    "model__min_child_samples": 40,
     "model__learning_rate": 0.01,
-    "model__colsample_bytree": 0.85
+    "model__colsample_bytree": 1.0
   },
-  "cv_best_score_roc_auc": 0.718216754092175,
+  "cv_best_score_roc_auc": 0.6995069885808659,
   "test_metrics": {
-    "accuracy": 0.8490566037735849,
-    "precision": 0.5294117647058824,
-    "recall": 0.06976744186046512,
-    "f1": 0.1232876712328767,
-    "roc_auc": 0.6685318756671087,
-    "pr_auc": 0.29455223116499585,
+    "accuracy": 0.8325471698113207,
+    "precision": 0.27586206896551724,
+    "recall": 0.06201550387596899,
+    "f1": 0.10126582278481013,
+    "roc_auc": 0.6251145540209808,
+    "pr_auc": 0.24071968203680763,
     "confusion_matrix": [
       [
-        711,
-        8
+        698,
+        21
       ],
       [
-        120,
-        9
+        121,
+        8
       ]
     ]
   },
@@ -37,7 +37,7 @@
   "n_iter": 6,
   "shap": false,
   "shap_paths": {},
-  "run_id": "20260407_232536",
+  "run_id": "20260407_234017",
   "_field_doc": {
     "dataset": "数据集代号（results/<dataset>/）",
     "csv_path": "本次实验使用的原始CSV路径（记录用）",

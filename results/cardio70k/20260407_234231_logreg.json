@@ -1,43 +1,37 @@
 {
-  "dataset": "framingham",
-  "csv_path": "framingham.csv",
-  "target": "TenYearCHD",
-  "model": "lgbm",
+  "dataset": "cardio70k",
+  "csv_path": "cardio_train.csv",
+  "target": "cardio",
+  "model": "logreg",
   "best_params": {
-    "model__subsample": 0.7,
-    "model__reg_lambda": 0.0,
-    "model__num_leaves": 127,
-    "model__n_estimators": 500,
-    "model__min_child_samples": 40,
-    "model__learning_rate": 0.01,
-    "model__colsample_bytree": 1.0
+    "model__C": 10
   },
-  "cv_best_score_roc_auc": 0.6995069885808659,
+  "cv_best_score_roc_auc": 0.7912418953755741,
   "test_metrics": {
-    "accuracy": 0.8325471698113207,
-    "precision": 0.27586206896551724,
-    "recall": 0.06201550387596899,
-    "f1": 0.10126582278481013,
-    "roc_auc": 0.6251145540209808,
-    "pr_auc": 0.24071968203680763,
+    "accuracy": 0.7226666666666667,
+    "precision": 0.7388535031847133,
+    "recall": 0.6927670869276709,
+    "f1": 0.7150684931506849,
+    "roc_auc": 0.7849735394237475,
+    "pr_auc": 0.7583338823781869,
     "confusion_matrix": [
       [
-        698,
-        21
+        1124,
+        369
       ],
       [
-        121,
-        8
+        463,
+        1044
       ]
     ]
   },
-  "n_train": 3392,
-  "n_test": 848,
+  "n_train": 12000,
+  "n_test": 3000,
   "cv_folds": 3,
-  "n_iter": 6,
+  "n_iter": 4,
   "shap": false,
   "shap_paths": {},
-  "run_id": "20260407_232536",
+  "run_id": "20260407_234231",
   "_field_doc": {
     "dataset": "数据集代号（results/<dataset>/）",
     "csv_path": "本次实验使用的原始CSV路径（记录用）",
