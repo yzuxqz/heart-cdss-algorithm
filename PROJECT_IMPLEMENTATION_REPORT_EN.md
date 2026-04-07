@@ -86,6 +86,47 @@ flowchart TD
     K -->|Yes| L[Generate beeswarm/bar/waterfall plots]
 ```
 
+### 4.2.1 Preprocessing Details
+
+Preprocessing is implemented by `build_preprocessor()` in `heart_cdss/preprocess.py` using a `ColumnTransformer`:
+
+- Numeric features: median imputation + standardization
+- Categorical features: most-frequent imputation + one-hot encoding
+- Low-cardinality integers: if a column is integer-typed and has `<= 10` unique values in the training set, it is treated as categorical
+
+Note: The low-cardinality rule depends on pandas dtypes. If a column contains missing values, pandas may load it as float, in which case it will not be considered an “integer low-cardinality” column and will be treated as numeric.
+
+**Term Definitions**
+
+- Median imputation: Fill missing values in numeric columns using the median computed on the training set (robust to outliers).
+- Standardization: Apply z-score scaling to numeric columns, `x' = (x - mean) / std`, to reduce unit/scale differences (especially helpful for LR).
+- Most-frequent imputation: Fill missing values in categorical columns using the most common category in the training set.
+- One-hot encoding: Expand a categorical column into multiple binary indicator columns.
+- Low cardinality: Integer-coded columns with very few distinct values (e.g., 0/1, 1/2/3) often represent discrete levels and are treated as categorical features.
+
+**Which Fields Use Which Steps (By Default Rules)**
+
+The model input feature matrix is `X`: the target column (`num` / `TenYearCHD` / `cardio`) and identifier-like columns (e.g., `id`) are removed first, and the remaining columns are split into numeric vs categorical pipelines.
+
+1) UCI Cleveland (`heart_disease_uci.csv`, target `num`)
+
+- Numeric (median + standardization): `age`, `trestbps`, `chol`, `thalch`, `oldpeak`
+- Categorical (most-frequent + one-hot): `sex`, `dataset`, `cp`, `restecg`, `slope`, `thal`
+- Low-cardinality integers → categorical (most-frequent + one-hot): `fbs`, `exang`, `ca`
+- Dropped: `num` (target), `id` (identifier)
+
+2) Framingham (`framingham.csv`, target `TenYearCHD`)
+
+- Numeric (median + standardization): `age`, `cigsPerDay`, `totChol`, `sysBP`, `diaBP`, `BMI`, `heartRate`, `glucose` (and any columns loaded as float)
+- Low-cardinality integers → categorical (most-frequent + one-hot, depends on dtype): `male`, `education`, `currentSmoker`, `BPMeds`, `prevalentStroke`, `prevalentHyp`, `diabetes` (and other 0/1 or few-level integer columns)
+- Dropped: `TenYearCHD` (target)
+
+3) Cardio 70k (`cardio_train.csv`, target `cardio`)
+
+- Numeric (median + standardization): `age`, `height`, `weight`, `ap_hi`, `ap_lo`
+- Low-cardinality integers → categorical (most-frequent + one-hot): `gender`, `cholesterol`, `gluc`, `smoke`, `alco`, `active`
+- Dropped: `cardio` (target), `id` (identifier)
+
 ### 4.3 Evaluation Metrics
 
 - Accuracy

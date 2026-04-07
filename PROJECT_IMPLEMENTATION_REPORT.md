@@ -86,6 +86,47 @@ flowchart TD
     K -->|是| L[生成beeswarm/bar/waterfall图片]
 ```
 
+### 4.2.1 预处理细节
+
+本项目的预处理由 `heart_cdss/preprocess.py` 的 `build_preprocessor()` 实现，形式是一个 `ColumnTransformer`：
+
+- 数值特征：中位数填补 + 标准化
+- 类别特征：众数填补 + 独热编码（One-Hot）
+- 低基数整数列：若某列为“整数类型”且训练集内唯一值个数 `<= 10`，则按“类别特征”处理
+
+注意：低基数判定依赖 pandas 读入后的 dtype；若某列存在缺失值，pandas 可能将其读成浮点（float），此时不会触发“整数低基数”规则，而会按数值特征处理。
+
+**术语解释（中文）**
+
+- 中位数填补：对数值列的缺失值，用训练集该列的中位数替换（比均值更不受极端值影响）。
+- 标准化：对数值列做 z-score，`x' = (x - mean) / std`，减少量纲差异（对 LR 等模型尤其重要）。
+- 众数填补：对类别列的缺失值，用训练集中出现次数最多的类别替换。
+- 独热编码（One-Hot）：把类别列展开为多列 0/1 指示变量（例如 `sex` 的不同取值展开为若干二元列）。
+- 低基数：唯一取值很少的整数列（例如 0/1、1/2/3），往往更接近“档位/编码”，因此按类别建模更合理。
+
+**在数据集哪些字段中用到（按默认规则说明）**
+
+预处理输入特征为 `X`：会先移除目标列（`num` / `TenYearCHD` / `cardio`）以及 ID 类字段（如 `id`），再对剩余列做分组预处理（参见 `prepare_dataset()` 的 `drop_cols` 逻辑）。
+
+1) UCI Cleveland（`heart_disease_uci.csv`，目标列 `num`）
+
+- 数值（中位数填补 + 标准化）：`age`, `trestbps`, `chol`, `thalch`, `oldpeak`
+- 类别（众数填补 + One-Hot）：`sex`, `dataset`, `cp`, `restecg`, `slope`, `thal`
+- 低基数整数 → 类别（众数填补 + One-Hot）：`fbs`, `exang`, `ca`
+- 丢弃：`num`（目标列），`id`（标识符列）
+
+2) Framingham（`framingham.csv`，目标列 `TenYearCHD`）
+
+- 数值（中位数填补 + 标准化）：`age`, `cigsPerDay`, `totChol`, `sysBP`, `diaBP`, `BMI`, `heartRate`, `glucose`（以及任何被 pandas 读成 float 的列）
+- 低基数整数 → 类别（众数填补 + One-Hot，取决于 dtype 是否为整数）：`male`, `education`, `currentSmoker`, `BPMeds`, `prevalentStroke`, `prevalentHyp`, `diabetes`（以及其它 0/1 或少档位整数列）
+- 丢弃：`TenYearCHD`（目标列）
+
+3) Cardio 70k（`cardio_train.csv`，目标列 `cardio`）
+
+- 数值（中位数填补 + 标准化）：`age`, `height`, `weight`, `ap_hi`, `ap_lo`
+- 低基数整数 → 类别（众数填补 + One-Hot）：`gender`, `cholesterol`, `gluc`, `smoke`, `alco`, `active`
+- 丢弃：`cardio`（目标列），`id`（标识符列）
+
 ### 4.3 评估指标
 
 - Accuracy

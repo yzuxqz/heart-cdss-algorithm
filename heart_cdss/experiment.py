@@ -31,6 +31,73 @@ from heart_cdss.metrics import evaluate, predict_proba_or_score
 from heart_cdss.models import get_models_and_spaces
 from heart_cdss.preprocess import build_preprocessor, normalize_bool_like_columns
 
+_RESULT_JSON_FIELD_DOC: dict[str, Any] = {
+    "dataset": "数据集代号（results/<dataset>/）",
+    "csv_path": "本次实验使用的原始CSV路径（记录用）",
+    "target": "目标列名（标签列）",
+    "model": "模型简称：logreg/rf/xgb/lgbm/cat",
+    "best_params": "随机搜索(RandomizedSearchCV)选出的最优超参数。因为模型在Pipeline里叫 model，所以键名前缀为 model__",
+    "cv_best_score_roc_auc": "交叉验证阶段(best_score_)的ROC-AUC（scoring=roc_auc），越大越好",
+    "test_metrics": {
+        "accuracy": "测试集准确率",
+        "precision": "测试集精确率",
+        "recall": "测试集召回率",
+        "f1": "测试集F1",
+        "roc_auc": "测试集ROC-AUC（用预测分数 y_score 计算）",
+        "pr_auc": "测试集PR-AUC（Precision-Recall曲线下面积）",
+        "confusion_matrix": "混淆矩阵 [[TN, FP], [FN, TP]]（基于阈值0.5的预测类别 y_pred）",
+    },
+    "n_train": "训练集样本数",
+    "n_test": "测试集样本数",
+    "cv_folds": "交叉验证折数（如存在）",
+    "n_iter": "超参数随机搜索迭代次数（如存在）",
+    "shap": "是否启用SHAP解释（如存在）",
+    "shap_paths": "SHAP输出图片路径字典（如存在）",
+    "run_id": "本次实验run编号（同一run_id下会生成summary.csv和每个模型的json）",
+    "_field_doc": "字段含义说明（本字典）",
+}
+
+
+def _prune_dataset_results(out_dir: Path, keep_run_id: str) -> None:
+    for p in out_dir.iterdir():
+        if not p.is_file():
+            continue
+        if p.suffix not in {".csv", ".json", ".png"}:
+            continue
+        if p.name.startswith(f"{keep_run_id}_"):
+            continue
+        try:
+            p.unlink(missing_ok=True)
+        except Exception:
+            continue
+
+
+def _save_model_comparison_plot(summary: pd.DataFrame, out_dir: Path, run_id: str) -> Path:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    df = summary.copy()
+    metrics = ["test_roc_auc", "test_f1", "test_recall", "test_precision"]
+    for m in metrics:
+        if m not in df.columns:
+            df[m] = np.nan
+    df = df.sort_values(by=["test_roc_auc", "test_f1"], ascending=False)
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8), constrained_layout=True)
+    axes = axes.ravel()
+    for ax, m in zip(axes, metrics):
+        ax.bar(df["model"].astype(str).tolist(), df[m].astype(float).tolist())
+        ax.set_title(m)
+        ax.set_ylim(0.0, 1.0)
+        ax.tick_params(axis="x", rotation=30)
+
+    path = out_dir / f"{run_id}_model_comparison.png"
+    fig.savefig(path, dpi=200)
+    plt.close(fig)
+    return path
+
 
 def infer_target_column(columns: list[str]) -> str:
     """
@@ -214,6 +281,7 @@ def run_experiment(args: RunArgs) -> Path:
             "shap": bool(args.shap),
             "shap_paths": shap_paths,
             "run_id": run_id,
+            "_field_doc": _RESULT_JSON_FIELD_DOC,
         }
 
         # 保存单模型 JSON 结果 / Save per-model JSON results
@@ -239,4 +307,11 @@ def run_experiment(args: RunArgs) -> Path:
     summary = pd.DataFrame(rows).sort_values(by=["test_roc_auc", "test_f1"], ascending=False)
     summary_path = out_dir / f"{run_id}_summary.csv"
     summary.to_csv(summary_path, index=False, encoding="utf-8-sig")
+
+    try:
+        _save_model_comparison_plot(summary, out_dir, run_id)
+    except Exception:
+        pass
+
+    _prune_dataset_results(out_dir, keep_run_id=run_id)
     return summary_path
