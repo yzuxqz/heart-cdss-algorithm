@@ -15,6 +15,7 @@ English:
 """
 
 import json
+import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -23,13 +24,14 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold, train_test_split
+from sklearn.metrics import roc_curve
 from sklearn.pipeline import Pipeline
 
 from heart_cdss.data import read_csv_auto
 from heart_cdss.explain import generate_shap_outputs
 from heart_cdss.metrics import evaluate, predict_proba_or_score
 from heart_cdss.models import get_models_and_spaces
-from heart_cdss.preprocess import build_preprocessor, normalize_bool_like_columns
+from heart_cdss.preprocess import build_preprocessor, filter_kaggle_outliers, normalize_bool_like_columns
 
 _RESULT_JSON_FIELD_DOC: dict[str, Any] = {
     "dataset": "数据集代号（results/<dataset>/）",
@@ -142,6 +144,10 @@ def prepare_dataset(
     if dataset_name in {"uci", "uci_cleveland"} and "dataset" in df.columns:
         df = df[df["dataset"].astype(str).str.strip().str.lower() == "cleveland"].copy()
 
+    # 过滤 Kaggle CVD 数据集的生理异常值 / Filter physiological outliers for Kaggle CVD
+    if dataset_name in {"cardio70k", "cardio"}:
+        df = filter_kaggle_outliers(df)
+
     if target_col not in df.columns:
         raise ValueError(f"目标列不存在 / Target column missing: {target_col}")
 
@@ -242,7 +248,7 @@ def run_experiment(args: RunArgs) -> Path:
             estimator=pipe,
             param_distributions=space,
             n_iter=args.n_iter,
-            scoring="roc_auc",
+            scoring="average_precision",
             cv=cv,
             n_jobs=-1,
             verbose=0,
@@ -250,13 +256,22 @@ def run_experiment(args: RunArgs) -> Path:
             refit=True,
         )
 
+        t0 = time.perf_counter()
         search.fit(X_train, y_train)
+        training_time = round(time.perf_counter() - t0, 2)
 
         # 评估最佳模型 / Evaluate the best model
         best = search.best_estimator_
         y_score = predict_proba_or_score(best, X_test)
-        y_pred = (y_score >= 0.5).astype(int)
+
+        # 基于训练集的 Youden 最优阈值 / Optimize threshold on training set via Youden's J
+        y_train_score = predict_proba_or_score(best, X_train)
+        fpr, tpr, thresholds = roc_curve(y_train, y_train_score)
+        youden_idx = int(np.argmax(tpr - fpr))
+        optimal_threshold = float(thresholds[youden_idx]) if youden_idx < len(thresholds) else 0.5
+        y_pred = (y_score >= optimal_threshold).astype(int)
         metrics = evaluate(np.asarray(y_test), y_pred, y_score)
+        metrics["optimal_threshold"] = round(optimal_threshold, 4)
 
         # 生成 SHAP 解释图（如果启用） / Generate SHAP explanations if enabled
         shap_paths: dict[str, str] = {}
@@ -290,6 +305,7 @@ def run_experiment(args: RunArgs) -> Path:
             "shap": bool(args.shap),
             "shap_paths": shap_paths,
             "run_id": run_id,
+            "training_time_s": training_time,
             "_field_doc": _RESULT_JSON_FIELD_DOC,
         }
 
@@ -309,6 +325,7 @@ def run_experiment(args: RunArgs) -> Path:
             "cv_folds": int(args.cv_folds),
             "n_iter": int(args.n_iter),
             "shap": bool(args.shap),
+            "training_time_s": training_time,
         }
         rows.append(row)
 

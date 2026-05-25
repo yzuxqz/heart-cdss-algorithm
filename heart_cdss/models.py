@@ -84,6 +84,7 @@ def make_model(model_name: str, random_state: int) -> Any:
         return LGBMClassifier(
             random_state=random_state,
             n_jobs=-1,
+            is_unbalance=True,
         )
     if model_name == "cat":
         if CatBoostClassifier is None:
@@ -92,6 +93,7 @@ def make_model(model_name: str, random_state: int) -> Any:
             random_seed=random_state,
             loss_function="Logloss",
             verbose=False,
+            auto_class_weights="Balanced",
         )
     raise ValueError(f"未知模型 / Unknown model: {model_name}")
 
@@ -155,6 +157,7 @@ def get_models_and_spaces(random_state: int) -> dict[str, tuple[Any, dict[str, l
                 "model__colsample_bytree": [0.7, 0.85, 1.0],
                 "model__min_child_weight": [1, 5, 10],
                 "model__reg_lambda": [0.5, 1.0, 2.0],
+                "model__scale_pos_weight": [1, 3, 5, 7, 10],
             },
         )
 

@@ -31,6 +31,10 @@ ENV/
 logs/
 catboost_info/
 
+# Claude
+.claude/
+.tmp/
+
 # IDE
 .vscode/
 .idea/

@@ -54,6 +54,40 @@ def normalize_bool_like_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def filter_kaggle_outliers(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    过滤 Kaggle CVD 数据集的生理异常值 / Filter physiological outliers from Kaggle CVD dataset.
+
+    中文：
+    - 移除血压、身高、体重超出人体生理边界的记录
+    - 移除收缩压小于舒张压的不合理记录
+
+    English:
+    - Removes records with blood pressure, height, or weight outside human physiological ranges
+    - Removes records where systolic BP <= diastolic BP (medically impossible)
+    """
+    initial = len(df)
+    mask = pd.Series(True, index=df.index)
+
+    conditions = {
+        "ap_hi out of range [80, 250]": df["ap_hi"].between(80, 250),
+        "ap_lo out of range [40, 200]": df["ap_lo"].between(40, 200),
+        "systolic <= diastolic": df["ap_hi"] > df["ap_lo"],
+        "height out of range [100, 250]": df["height"].between(100, 250),
+        "weight out of range [30, 200]": df["weight"].between(30, 200),
+    }
+
+    for label, cond in conditions.items():
+        before = mask.sum()
+        mask = mask & cond
+        removed = before - mask.sum()
+        if removed > 0:
+            print(f"  [Kaggle outlier filter] {label}: removed {removed} rows")
+
+    print(f"  [Kaggle outlier filter] {initial} -> {mask.sum()} rows ({initial - mask.sum()} removed)")
+    return df[mask].reset_index(drop=True)
+
+
 def build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
     """
     构建特征预处理器 / Build feature preprocessor.
