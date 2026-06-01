@@ -80,7 +80,7 @@ def main() -> None:
     seed = 42
 
     # ── Load & prepare data ──
-    df = read_csv_auto(PROJECT_DIR / "cardio_train.csv")
+    df = read_csv_auto(PROJECT_DIR / "datasets" / "cardio_train.csv")
     X, y = prepare_dataset(df, "cardio70k", "cardio")
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=seed, stratify=y,

@@ -29,19 +29,19 @@ OUT_DIR = BASE_DIR / "processed_datasets"
 DATASETS = [
     {
         "code": "uci_cleveland",
-        "csv": "heart_disease_uci.csv",
+        "csv": "datasets/heart_disease_uci.csv",
         "target": "num",
         "prepare_name": "uci_cleveland",
     },
     {
         "code": "framingham",
-        "csv": "framingham.csv",
+        "csv": "datasets/framingham.csv",
         "target": "TenYearCHD",
         "prepare_name": "framingham",
     },
     {
         "code": "cardio70k",
-        "csv": "cardio_train.csv",
+        "csv": "datasets/cardio_train.csv",
         "target": "cardio",
         "prepare_name": "cardio70k",
     },

@@ -167,6 +167,7 @@ def get_models_and_spaces(random_state: int) -> dict[str, tuple[Any, dict[str, l
             LGBMClassifier(
                 random_state=random_state,
                 n_jobs=-1,
+                is_unbalance=True,
             ),
             {
                 "model__n_estimators": [500, 1000, 1500],
@@ -186,6 +187,7 @@ def get_models_and_spaces(random_state: int) -> dict[str, tuple[Any, dict[str, l
                 random_seed=random_state,
                 loss_function="Logloss",
                 verbose=False,
+                auto_class_weights="Balanced",
             ),
             {
                 "model__iterations": [500, 1000, 1500],

@@ -138,7 +138,7 @@ def main() -> None:
     seed = 42
 
     for ds_code, cfg in DATASETS.items():
-        df = read_csv_auto(PROJECT_DIR / cfg["csv"])
+        df = read_csv_auto(PROJECT_DIR / "datasets" / cfg["csv"])
         X, y = prepare_dataset(df, cfg["ds_name"], cfg["target"])
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=seed, stratify=y,

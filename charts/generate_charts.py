@@ -37,9 +37,9 @@ RESULTS_DIR = PROJECT_DIR / "results"
 
 def fig_target_distribution() -> None:
     datasets = {
-        "Cleveland (UCI)": (PROJECT_DIR / "heart_disease_uci.csv", "uci_cleveland", "num"),
-        "Framingham": (PROJECT_DIR / "framingham.csv", "framingham", "TenYearCHD"),
-        "Cardio70k": (PROJECT_DIR / "cardio_train.csv", "cardio70k", "cardio"),
+        "Cleveland (UCI)": (PROJECT_DIR / "datasets" / "heart_disease_uci.csv", "uci_cleveland", "num"),
+        "Framingham": (PROJECT_DIR / "datasets" / "framingham.csv", "framingham", "TenYearCHD"),
+        "Cardio70k": (PROJECT_DIR / "datasets" / "cardio_train.csv", "cardio70k", "cardio"),
     }
 
     records = []
@@ -263,9 +263,9 @@ def _get_numeric_corr(X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
 def fig_correlation_heatmaps() -> None:
     """每数据集独立一张热力图 / One standalone heatmap per dataset."""
     datasets = [
-        ("Cleveland (UCI)", PROJECT_DIR / "heart_disease_uci.csv", "uci_cleveland", "num"),
-        ("Framingham", PROJECT_DIR / "framingham.csv", "framingham", "TenYearCHD"),
-        ("Cardio70k", PROJECT_DIR / "cardio_train.csv", "cardio70k", "cardio"),
+        ("Cleveland (UCI)", PROJECT_DIR / "datasets" / "heart_disease_uci.csv", "uci_cleveland", "num"),
+        ("Framingham", PROJECT_DIR / "datasets" / "framingham.csv", "framingham", "TenYearCHD"),
+        ("Cardio70k", PROJECT_DIR / "datasets" / "cardio_train.csv", "cardio70k", "cardio"),
     ]
 
     for title, csv_path, ds, target_col in datasets:

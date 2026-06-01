@@ -60,17 +60,17 @@ if exist "artifacts\cardio70k" rmdir /s /q "artifacts\cardio70k"
 
 echo.
 echo Running: uci_cleveland
-"%PYTHON_EXE%" %PYTHON_ARGS% run_experiments.py --dataset uci_cleveland --csv heart_disease_uci.csv --target num --test-size 0.2 --seed 42 --n-iter 25 --cv-folds 5
+"%PYTHON_EXE%" %PYTHON_ARGS% run_experiments.py --dataset uci_cleveland --csv datasets\heart_disease_uci.csv --target num --test-size 0.2 --seed 42 --n-iter 25 --cv-folds 5
 if errorlevel 1 goto :fail
 
 echo.
 echo Running: framingham
-"%PYTHON_EXE%" %PYTHON_ARGS% run_experiments.py --dataset framingham --csv framingham.csv --target TenYearCHD --test-size 0.2 --seed 42 --n-iter 25 --cv-folds 5
+"%PYTHON_EXE%" %PYTHON_ARGS% run_experiments.py --dataset framingham --csv datasets\framingham.csv --target TenYearCHD --test-size 0.2 --seed 42 --n-iter 25 --cv-folds 5
 if errorlevel 1 goto :fail
 
 echo.
 echo Running: cardio70k
-"%PYTHON_EXE%" %PYTHON_ARGS% run_experiments.py --dataset cardio70k --csv cardio_train.csv --target cardio --test-size 0.2 --seed 42 --n-iter 25 --cv-folds 5
+"%PYTHON_EXE%" %PYTHON_ARGS% run_experiments.py --dataset cardio70k --csv datasets\cardio_train.csv --target cardio --test-size 0.2 --seed 42 --n-iter 25 --cv-folds 5
 if errorlevel 1 goto :fail
 
 echo.

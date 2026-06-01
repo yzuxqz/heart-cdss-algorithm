@@ -2,51 +2,52 @@
   "dataset": "framingham",
   "csv_path": "framingham.csv",
   "target": "TenYearCHD",
-  "model": "lgbm",
+  "model": "cat",
   "best_params": {
-    "model__subsample": 1.0,
-    "model__reg_lambda": 2.0,
-    "model__num_leaves": 31,
-    "model__n_estimators": 500,
-    "model__min_child_samples": 10,
     "model__learning_rate": 0.01,
-    "model__colsample_bytree": 1.0
+    "model__l2_leaf_reg": 1,
+    "model__iterations": 500,
+    "model__depth": 4
   },
-  "cv_best_score_roc_auc": 0.3232535500114716,
+  "cv_best_score_pr_auc": 0.3582045321383867,
   "test_metrics": {
-    "accuracy": 0.7417452830188679,
-    "precision": 0.24431818181818182,
-    "recall": 0.3333333333333333,
-    "f1": 0.2819672131147541,
-    "roc_auc": 0.6375241237291243,
-    "pr_auc": 0.26644839053832264,
+    "accuracy": 0.6650943396226415,
+    "precision": 0.24919093851132687,
+    "recall": 0.5968992248062015,
+    "f1": 0.3515981735159817,
+    "roc_auc": 0.6839171545320266,
+    "pr_auc": 0.292532191998289,
     "confusion_matrix": [
       [
-        586,
-        133
+        487,
+        232
       ],
       [
-        86,
-        43
+        52,
+        77
       ]
     ],
-    "optimal_threshold": 0.2205
+    "optimal_threshold": 0.5054
   },
   "n_train": 3392,
   "n_test": 848,
   "cv_folds": 5,
   "n_iter": 25,
-  "shap": false,
-  "shap_paths": {},
-  "run_id": "20260524_190603",
-  "training_time_s": 105.26,
+  "shap": true,
+  "shap_paths": {
+    "beeswarm": "C:\\Users\\13363\\Desktop\\ukm\\P2\\code\\heart-cdss-algorithm\\results\\framingham\\20260531_174145_cat_shap_beeswarm.png",
+    "bar": "C:\\Users\\13363\\Desktop\\ukm\\P2\\code\\heart-cdss-algorithm\\results\\framingham\\20260531_174145_cat_shap_bar.png",
+    "waterfall": "C:\\Users\\13363\\Desktop\\ukm\\P2\\code\\heart-cdss-algorithm\\results\\framingham\\20260531_174145_cat_shap_waterfall_0.png"
+  },
+  "run_id": "20260531_174145",
+  "training_time_s": 280.22,
   "_field_doc": {
     "dataset": "数据集代号（results/<dataset>/）",
     "csv_path": "本次实验使用的原始CSV路径（记录用）",
     "target": "目标列名（标签列）",
     "model": "模型简称：logreg/rf/xgb/lgbm/cat",
     "best_params": "随机搜索(RandomizedSearchCV)选出的最优超参数。因为模型在Pipeline里叫 model，所以键名前缀为 model__",
-    "cv_best_score_roc_auc": "交叉验证阶段(best_score_)的ROC-AUC（scoring=roc_auc），越大越好",
+    "cv_best_score_pr_auc": "交叉验证阶段(best_score_)的PR-AUC（scoring=average_precision），越大越好",
     "test_metrics": {
       "accuracy": "测试集准确率",
       "precision": "测试集精确率",

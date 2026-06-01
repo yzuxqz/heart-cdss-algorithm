@@ -195,19 +195,19 @@ def main() -> None:
     datasets = [
         DatasetConfig(
             code="uci_cleveland",
-            csv_path=base_dir / "heart_disease_uci.csv",
+            csv_path=base_dir / "datasets" / "heart_disease_uci.csv",
             target="num",
             dataset_name_for_prepare="uci_cleveland",
         ),
         DatasetConfig(
             code="framingham",
-            csv_path=base_dir / "framingham.csv",
+            csv_path=base_dir / "datasets" / "framingham.csv",
             target="TenYearCHD",
             dataset_name_for_prepare="framingham",
         ),
         DatasetConfig(
             code="cardio70k",
-            csv_path=base_dir / "cardio_train.csv",
+            csv_path=base_dir / "datasets" / "cardio_train.csv",
             target="cardio",
             dataset_name_for_prepare="cardio70k",
         ),

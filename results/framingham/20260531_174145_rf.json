@@ -1,50 +1,54 @@
 {
-  "dataset": "uci_cleveland",
-  "csv_path": "heart_disease_uci.csv",
-  "target": "num",
-  "model": "xgb",
+  "dataset": "framingham",
+  "csv_path": "framingham.csv",
+  "target": "TenYearCHD",
+  "model": "rf",
   "best_params": {
-    "model__subsample": 0.85,
-    "model__reg_lambda": 2.0,
     "model__n_estimators": 300,
-    "model__min_child_weight": 10,
-    "model__max_depth": 4,
-    "model__learning_rate": 0.03,
-    "model__colsample_bytree": 0.7
+    "model__min_samples_split": 2,
+    "model__min_samples_leaf": 2,
+    "model__max_features": "sqrt",
+    "model__max_depth": null
   },
-  "cv_best_score_roc_auc": 0.9016539418713332,
+  "cv_best_score_pr_auc": 0.34210421272359914,
   "test_metrics": {
-    "accuracy": 0.8852459016393442,
-    "precision": 0.8620689655172413,
-    "recall": 0.8928571428571429,
-    "f1": 0.8771929824561403,
-    "roc_auc": 0.9653679653679654,
-    "pr_auc": 0.9626405680894384,
+    "accuracy": 0.8419811320754716,
+    "precision": 0.41935483870967744,
+    "recall": 0.10077519379844961,
+    "f1": 0.1625,
+    "roc_auc": 0.6528015870448836,
+    "pr_auc": 0.2648566923862289,
     "confusion_matrix": [
       [
-        29,
-        4
+        701,
+        18
       ],
       [
-        3,
-        25
+        116,
+        13
       ]
-    ]
+    ],
+    "optimal_threshold": 0.4963
   },
-  "n_train": 243,
-  "n_test": 61,
+  "n_train": 3392,
+  "n_test": 848,
   "cv_folds": 5,
-  "n_iter": 10,
-  "shap": false,
-  "shap_paths": {},
-  "run_id": "20260407_233930",
+  "n_iter": 25,
+  "shap": true,
+  "shap_paths": {
+    "beeswarm": "C:\\Users\\13363\\Desktop\\ukm\\P2\\code\\heart-cdss-algorithm\\results\\framingham\\20260531_174145_rf_shap_beeswarm.png",
+    "bar": "C:\\Users\\13363\\Desktop\\ukm\\P2\\code\\heart-cdss-algorithm\\results\\framingham\\20260531_174145_rf_shap_bar.png",
+    "waterfall": "C:\\Users\\13363\\Desktop\\ukm\\P2\\code\\heart-cdss-algorithm\\results\\framingham\\20260531_174145_rf_shap_waterfall_0.png"
+  },
+  "run_id": "20260531_174145",
+  "training_time_s": 53.92,
   "_field_doc": {
     "dataset": "数据集代号（results/<dataset>/）",
     "csv_path": "本次实验使用的原始CSV路径（记录用）",
     "target": "目标列名（标签列）",
     "model": "模型简称：logreg/rf/xgb/lgbm/cat",
     "best_params": "随机搜索(RandomizedSearchCV)选出的最优超参数。因为模型在Pipeline里叫 model，所以键名前缀为 model__",
-    "cv_best_score_roc_auc": "交叉验证阶段(best_score_)的ROC-AUC（scoring=roc_auc），越大越好",
+    "cv_best_score_pr_auc": "交叉验证阶段(best_score_)的PR-AUC（scoring=average_precision），越大越好",
     "test_metrics": {
       "accuracy": "测试集准确率",
       "precision": "测试集精确率",
