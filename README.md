@@ -155,27 +155,6 @@ The app provides:
 - **Explainability tab:** Global SHAP beeswarm and bar plots
 - **Batch Predict tab:** Upload CSV for batch scoring (up to 5,000 rows)
 
-### 6. Generate thesis charts
-
-```bash
-# Cross-dataset comparison (target distribution, F1, ROC-AUC, training time, correlation heatmaps)
-python charts/generate_charts.py
-
-# Per-dataset four-metric bar charts
-python charts/fig_four_metrics.py
-
-# Per-dataset ROC curves with zoom inset
-python charts/fig_roc_curves.py
-
-# Global SHAP for Cardio70k (beeswarm + bar)
-python charts/fig_shap_cardio70k.py
-
-# Local SHAP waterfall plots for Section 4.5.2
-python charts/generate_local_shap.py
-```
-
----
-
 ## Evaluation Metrics
 
 All models are evaluated on:
