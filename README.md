@@ -68,7 +68,7 @@ heart-cdss-algorithm/
 | **LightGBM** | Boosting ensemble | `is_unbalance=True` |
 | **CatBoost** | Boosting ensemble | `auto_class_weights="Balanced"` |
 
-**Hyperparameter tuning:** `RandomizedSearchCV` with `n_iter=25`, 5-fold stratified cross-validation, optimized for PR-AUC (`average_precision`). Train/test split: 80/20, stratified, `random_state=42`.
+**Hyperparameter tuning:** `RandomizedSearchCV` with `n_iter=25`, 5-fold stratified cross-validation, optimized for ROC-AUC (`roc_auc`). Train/test split: 80/20, stratified, `random_state=42`.
 
 ## Datasets
 
@@ -165,8 +165,8 @@ All models are evaluated on:
 | **Precision** | Positive predictive value |
 | **Recall** | True positive rate (sensitivity) |
 | **F1-Score** | Harmonic mean of Precision and Recall |
-| **ROC-AUC** | Area under the ROC curve |
-| **PR-AUC** | Area under the Precision-Recall curve (primary CV optimization target) |
+| **ROC-AUC** | Area under the ROC curve (primary CV optimization target) |
+| **PR-AUC** | Area under the Precision-Recall curve |
 
 Classification thresholds are optimized per model using **Youden's J statistic** on the training set.
 
