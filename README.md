@@ -1,7 +1,5 @@
 # Heart CDSS — Ensemble Learning for Early Heart Disease Detection
 
-A Clinical Decision Support System (CDSS) for cardiovascular disease risk prediction, built as part of a Master of Computer Science thesis at Universiti Kebangsaan Malaysia (UKM).
-
 **Key features:**
 - Evaluates 5 ML algorithms across 3 multi-scale clinical datasets (N=303 to N=70,000)
 - SHAP-based model interpretability (global + local)
@@ -202,7 +200,3 @@ Classification thresholds are optimized per model using **Youden's J statistic**
 - SHAP visualizations revealed that **systolic blood pressure, age, and cholesterol** are consistently the most influential predictors across all datasets
 
 ---
-
-## Citation
-
-Xu Qianzhou. *Ensemble Learning Techniques for Early Heart Disease Detection: From Algorithm to Prototype Development.* Master's Thesis, Universiti Kebangsaan Malaysia (UKM), 2026.
