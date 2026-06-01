@@ -166,7 +166,6 @@ All models are evaluated on:
 | **Recall** | True positive rate (sensitivity) |
 | **F1-Score** | Harmonic mean of Precision and Recall |
 | **ROC-AUC** | Area under the ROC curve (primary CV optimization target) |
-| **PR-AUC** | Area under the Precision-Recall curve |
 
 Classification thresholds are optimized per model using **Youden's J statistic** on the training set.
 
