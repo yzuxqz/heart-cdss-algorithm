@@ -17,7 +17,7 @@ from heart_cdss.persist import load_joblib, load_json
 
 BASE = Path(__file__).resolve().parent
 ARTIFACTS_DIR = BASE / "artifacts" / "cardio70k"
-CHARTS_DIR = BASE / "charts" / "cardio70k"
+CHARTS_DIR = BASE / "charts" / "global"
 
 # ── Constants ──
 YOUDEW_THRESHOLD = 0.7383
