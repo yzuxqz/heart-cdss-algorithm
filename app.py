@@ -291,7 +291,9 @@ def main() -> None:
     st.title("Cardiovascular Disease Risk Assessment")
     st.caption("Cardio70k dataset  ·  XGBoost  ·  SHAP Explainability  ·  Batch Scoring")
 
-    tab_predict, tab_explain, tab_batch = st.tabs(["Predict", "Explainability", "Batch Predict"])
+    tab_predict, tab_explain, tab_batch, tab_manual, tab_about = st.tabs([
+        "Predict", "Explainability", "Batch Predict", "User Manual", "About"
+    ])
 
     # ════════════════════ Tab 1: Predict ════════════════════
     with tab_predict:
@@ -400,6 +402,151 @@ def main() -> None:
                 file_name="cardio70k_predictions.csv",
                 mime="text/csv",
             )
+
+
+    # ════════════════════ Tab 4: User Manual ════════════════════
+    with tab_manual:
+        st.subheader("User Manual")
+
+        st.markdown("""
+        ### Welcome to Heart CDSS
+
+        This Clinical Decision Support System (CDSS) predicts cardiovascular disease (CVD) risk
+        using a machine learning model (XGBoost) trained on 68,635 patient records from the
+        Kaggle Cardiovascular Disease dataset.
+
+        ---
+
+        ### 1. Single Patient Prediction (Predict Tab)
+
+        **Step 1:** Fill in the patient's clinical data in the input form.
+
+        | Field | What to enter |
+        |---|---|
+        | Age | Patient's age in years (auto-converted to days) |
+        | Gender | 1 = Female, 2 = Male |
+        | Height | Height in centimeters |
+        | Weight | Weight in kilograms |
+        | Systolic BP | Upper blood pressure reading (mmHg) |
+        | Diastolic BP | Lower blood pressure reading (mmHg) |
+        | Cholesterol | 1 = Normal, 2 = Above Normal, 3 = Well Above Normal |
+        | Glucose | 1 = Normal, 2 = Above Normal, 3 = Well Above Normal |
+        | Smoking / Alcohol / Activity | 0 = No, 1 = Yes |
+
+        **Step 2:** Click **\"Run Prediction\"** to see the risk score.
+
+        **Step 3:** Click **\"Generate Local SHAP Explanation\"** to view a waterfall chart
+        showing exactly which factors pushed the prediction toward high or low risk.
+
+        **Interpreting the SHAP Waterfall:**
+        - **Red bars (right):** Features that increase risk
+        - **Blue bars (left):** Features that decrease risk
+        - Bar length = strength of the feature's contribution
+        - The final value is the model's log-odds prediction
+
+        ---
+
+        ### 2. Decision Threshold
+
+        Use the **slider in the sidebar** to adjust the classification threshold:
+        - **Lower threshold (e.g., 0.3):** Catch more at-risk patients (higher recall),
+          but more false alarms
+        - **Higher threshold (e.g., 0.7):** Fewer false alarms, but may miss some
+          at-risk patients
+        - **Default (0.7383):** Youden-optimal threshold — best balance of sensitivity
+          and specificity
+
+        ---
+
+        ### 3. Model Explainability (Explainability Tab)
+
+        View **global SHAP plots** that show which features drive the model across
+        all patients:
+        - **Beeswarm plot:** Each dot = one patient. Red = high feature value,
+          Blue = low. SHAP > 0 pushes toward high risk.
+        - **Bar plot:** Shows average importance of each feature across all patients.
+
+        *Run `python charts/fig_shap_cardio70k.py` before launching the app to
+        generate these plots.*
+
+        ---
+
+        ### 4. Batch Prediction (Batch Predict Tab)
+
+        **Step 1:** Prepare a CSV file with the same column names as the Cardio70k dataset.
+
+        **Step 2:** Upload the CSV and click **\"Run Batch Prediction\"**.
+
+        **Step 3:** Download results as a CSV with added columns:
+        `risk_proba` (risk probability) and `risk_label` (\"High Risk\" / \"Low Risk\").
+
+        *Note: Maximum 5,000 rows per batch.*
+        """)
+
+    # ════════════════════ Tab 5: About ════════════════════
+    with tab_about:
+        st.subheader("About This Project")
+
+        col_left, col_right = st.columns([2, 1])
+
+        with col_left:
+            st.markdown("""
+            ### Heart CDSS — Ensemble Learning for Early Heart Disease Detection
+
+            This system is part of a Master of Computer Science thesis at
+            **Universiti Kebangsaan Malaysia (UKM)**, Faculty of Information Science
+            and Technology.
+
+            **Research Objectives:**
+            1. Evaluate and compare five ML algorithms (Logistic Regression, Random
+               Forest, XGBoost, LightGBM, CatBoost) across three multi-scale clinical
+               datasets
+            2. Develop an interpretable, web-based CDSS prototype using Streamlit
+            3. Provide both global and local model interpretability through SHAP
+               visualizations
+
+            **Deployed Model:**
+            - **Algorithm:** XGBoost (best performer on Cardio70k)
+            - **Training Data:** Kaggle Cardiovascular Disease dataset (N=68,635)
+            - **Optimization:** RandomizedSearchCV with 5-fold stratified cross-validation
+            - **Threshold:** Youden-optimal (0.7383)
+            """)
+
+        with col_right:
+            st.markdown("""
+            ### Author
+            **Xu Qianzhou**
+
+            ### Supervisor
+            *(UKM FTSM)*
+
+            ### Year
+            2026
+
+            ---
+
+            ### Tech Stack
+            - Python 3.13
+            - Streamlit
+            - XGBoost
+            - SHAP
+            - scikit-learn
+            """)
+
+        st.divider()
+        st.markdown("""
+        ### Citation
+        Xu Qianzhou. *Ensemble Learning Techniques for Early Heart Disease Detection:
+        From Algorithm to Prototype Development.* Master's Thesis,
+        Universiti Kebangsaan Malaysia (UKM), 2026.
+
+        ### Disclaimer
+        This system is a research prototype intended for **demonstration and educational
+        purposes only**. It is not a medical device and should not be used for actual
+        clinical diagnosis without proper validation and regulatory approval.
+        """)
+
+        st.info("For questions or feedback, please contact the author through UKM FTSM.")
 
 
 if __name__ == "__main__":
