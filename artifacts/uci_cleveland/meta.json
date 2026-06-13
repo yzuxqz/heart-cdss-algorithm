@@ -1,0 +1,59 @@
+{
+  "dataset": "uci_cleveland",
+  "csv_path": "D:\\P2\\heart-cdss-algorithm\\datasets\\heart_disease_uci.csv",
+  "target": "num",
+  "best_from_summary": "D:\\P2\\heart-cdss-algorithm\\results\\uci_cleveland\\20260524_190227_summary.csv",
+  "best_run_id": "20260524_190227",
+  "best_model": "lgbm",
+  "best_params": {
+    "subsample": 0.85,
+    "reg_lambda": 1.0,
+    "num_leaves": 127,
+    "n_estimators": 1000,
+    "min_child_samples": 40,
+    "learning_rate": 0.01,
+    "colsample_bytree": 0.7
+  },
+  "best_row": {
+    "run_id": "20260524_190227",
+    "dataset": "uci_cleveland",
+    "model": "lgbm",
+    "cv_roc_auc": 0.88949465046679,
+    "test_accuracy": 0.8852459016393442,
+    "test_precision": 0.8181818181818182,
+    "test_recall": 0.9642857142857144,
+    "test_f1": 0.8852459016393442,
+    "test_roc_auc": 0.9686147186147188,
+    "test_pr_auc": 0.9639617143432035,
+    "test_optimal_threshold": 0.3584,
+    "n_train": 243,
+    "n_test": 61,
+    "cv_folds": 5,
+    "n_iter": 25,
+    "shap": false,
+    "training_time_s": 16.82
+  },
+  "models_dir": "D:\\P2\\heart-cdss-algorithm\\artifacts\\uci_cleveland\\models",
+  "available_models": [
+    {
+      "model": "lgbm",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\uci_cleveland\\models\\lgbm\\model.joblib"
+    },
+    {
+      "model": "logreg",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\uci_cleveland\\models\\logreg\\model.joblib"
+    },
+    {
+      "model": "rf",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\uci_cleveland\\models\\rf\\model.joblib"
+    },
+    {
+      "model": "xgb",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\uci_cleveland\\models\\xgb\\model.joblib"
+    },
+    {
+      "model": "cat",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\uci_cleveland\\models\\cat\\model.joblib"
+    }
+  ]
+}

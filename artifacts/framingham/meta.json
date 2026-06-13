@@ -1,0 +1,53 @@
+{
+  "dataset": "framingham",
+  "csv_path": "D:\\P2\\heart-cdss-algorithm\\datasets\\framingham.csv",
+  "target": "TenYearCHD",
+  "best_from_summary": "D:\\P2\\heart-cdss-algorithm\\results\\framingham\\20260531_174145_summary.csv",
+  "best_run_id": "20260531_174145",
+  "best_model": "logreg",
+  "best_params": {
+    "C": 0.05
+  },
+  "best_row": {
+    "run_id": "20260531_174145",
+    "dataset": "framingham",
+    "model": "logreg",
+    "cv_pr_auc": 0.3582667311285631,
+    "test_accuracy": 0.6662735849056604,
+    "test_precision": 0.2516129032258064,
+    "test_recall": 0.6046511627906976,
+    "test_f1": 0.3553530751708428,
+    "test_roc_auc": 0.7004560597729405,
+    "test_pr_auc": 0.3006329399975536,
+    "test_optimal_threshold": 0.4986,
+    "n_train": 3392,
+    "n_test": 848,
+    "cv_folds": 5,
+    "n_iter": 25,
+    "shap": true,
+    "training_time_s": 3.49
+  },
+  "models_dir": "D:\\P2\\heart-cdss-algorithm\\artifacts\\framingham\\models",
+  "available_models": [
+    {
+      "model": "logreg",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\framingham\\models\\logreg\\model.joblib"
+    },
+    {
+      "model": "cat",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\framingham\\models\\cat\\model.joblib"
+    },
+    {
+      "model": "xgb",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\framingham\\models\\xgb\\model.joblib"
+    },
+    {
+      "model": "rf",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\framingham\\models\\rf\\model.joblib"
+    },
+    {
+      "model": "lgbm",
+      "path": "D:\\P2\\heart-cdss-algorithm\\artifacts\\framingham\\models\\lgbm\\model.joblib"
+    }
+  ]
+}

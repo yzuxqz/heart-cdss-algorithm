@@ -18,6 +18,7 @@ from heart_cdss.persist import load_joblib, load_json
 BASE = Path(__file__).resolve().parent
 ARTIFACTS_DIR = BASE / "artifacts" / "cardio70k"
 CHARTS_DIR = BASE / "charts" / "global"
+SCREENSHOTS_DIR = BASE / "screenshots"
 
 # ── Constants ──
 YOUDEW_THRESHOLD = 0.7383
@@ -69,7 +70,8 @@ def inject_styles() -> None:
     .stApp {
       background: linear-gradient(180deg, #f8fafc, #f1f5f9);
     }
-    header, footer { visibility: hidden; }
+    footer { visibility: hidden; }
+    header [data-testid="stToolbarActions"] { display: none; }
     .block-container { padding-top: 1rem; }
     .risk-card {
       border: 1px solid #e2e8f0;
@@ -120,6 +122,8 @@ def inject_styles() -> None:
       border: 1px solid #cbd5e1;
       background: #f8fafc;
     }
+
+    /* Top-right icon buttons */
     </style>
     """, unsafe_allow_html=True)
 
@@ -191,7 +195,12 @@ def build_input_form(schema: dict) -> pd.DataFrame:
 # SHAP — local waterfall
 # ═══════════════════════════════════════════════════════════════════════
 
-def generate_local_shap(pipeline, X_input: pd.DataFrame, out_dir: Path) -> Path | None:
+def generate_local_shap(pipeline, X_input: pd.DataFrame, out_dir: Path):
+    """Generate a clinical-grade SHAP waterfall figure for a single patient.
+
+    Returns a matplotlib Figure ready for st.pyplot(), or None on failure.
+    """
+    import copy
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -209,50 +218,292 @@ def generate_local_shap(pipeline, X_input: pd.DataFrame, out_dir: Path) -> Path 
     if isinstance(ev, (list, np.ndarray)):
         ev = float(ev[1] if len(ev) > 1 else ev[0])
 
-    # Feature names
+    # ── 1. Deep-copy SHAP values to prevent mutation of original data ──
+    display_shap_values = copy.deepcopy(shap_vals[0])
+
+    # ── 2. Clinical feature-name mapping ──
+    CLINICAL_NAMES: dict[str, str] = {
+        "age":          "Age (Years)",
+        "gender":       "Gender",
+        "height":       "Height (cm)",
+        "weight":       "Weight (kg)",
+        "ap_hi":        "Systolic Blood Pressure (mmHg)",
+        "ap_lo":        "Diastolic Blood Pressure (mmHg)",
+        "cholesterol":  "Cholesterol Level",
+        "gluc":         "Glucose Level",
+        "smoke":        "Smoking Status",
+        "alco":         "Alcohol Intake",
+        "active":       "Physical Activity",
+    }
+
+    # Get raw preprocessor feature names
     try:
         raw_names = pre.get_feature_names_out()
     except Exception:
         raw_names = [f"feature_{i}" for i in range(X_t.shape[1])]
 
-    cn_map = {v[0]: k for k, v in FEATURE_LABELS.items()}
-    feature_names = []
+    # Translate each raw feature name to its clinical equivalent
+    feature_names: list[str] = []
     for n in raw_names:
         n = str(n)
+        # Strip sklearn prefix  (e.g. "num__age" → "age", "cat__cholesterol_1" → "cholesterol_1")
         if "__" in n:
             _, fv = n.split("__", 1)
         else:
             fv = n
+        # Handle one-hot-encoded features  (e.g. "cholesterol_1" → "Cholesterol Level=1")
         parts = fv.rsplit("_", 1)
-        if len(parts) == 2 and parts[1].isdigit() and parts[0] in cn_map:
-            label = cn_map[parts[0]]
-            feature_names.append(f"{label}={parts[1]}")
+        if len(parts) == 2 and parts[1].isdigit() and parts[0] in CLINICAL_NAMES:
+            clinical_name = CLINICAL_NAMES[parts[0]]
+            feature_names.append(f"{clinical_name}={parts[1]}")
+        elif fv in CLINICAL_NAMES:
+            feature_names.append(CLINICAL_NAMES[fv])
         else:
             feature_names.append(fv)
 
+    # ── 3. Build display data — convert age from days to years ──
+    display_data = X_t[0].copy()
+
+    # Locate the "age" column index
+    age_idx: int | None = None
+    for i, n in enumerate(raw_names):
+        n_str = str(n)
+        if "__" in n_str:
+            _, fv = n_str.split("__", 1)
+        else:
+            fv = n_str
+        if fv == "age":
+            age_idx = i
+            break
+
+    if age_idx is not None:
+        raw_age_days = float(X_input["age"].iloc[0])
+        display_data[age_idx] = round(raw_age_days / 365.25, 1)
+
+    # ── 4. Build SHAP Explanation with display-friendly data ──
     exp = shap.Explanation(
-        values=shap_vals[0],
+        values=display_shap_values,
         base_values=ev,
-        data=X_t[0],
+        data=display_data,
         feature_names=feature_names,
     )
 
-    fig, ax = plt.subplots(figsize=(9, 7))
+    # ── 5. Create and style the figure ──
+    fig, ax = plt.subplots(figsize=(10, 6))
     shap.plots.waterfall(exp, max_display=10, show=False)
-    ax.set_xlabel("SHAP value (impact on model output)", fontsize=11)
-    ax.set_title("SHAP Waterfall — Current Patient", fontsize=13, fontweight="bold")
-    fig.tight_layout()
 
-    out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / "local_waterfall.png"
-    fig.savefig(path, dpi=200, bbox_inches="tight", facecolor="white", edgecolor="none")
-    plt.close(fig)
-    return path
+    # Clean axis — title & caption are set by the caller via st.markdown
+    ax.set_xlabel("")
+    ax.set_title("")
+
+    # ── Shrink left-side feature labels ──
+    for txt in ax.texts:
+        # SHAP waterfall places feature name/value labels on the left (x < 0)
+        if txt.get_position()[0] < 0:
+            txt.set_fontsize(7.5)
+        # Also shrink the f(x) and E[f(x)] labels slightly
+        elif "f(x)" in txt.get_text() or "E[f(x)]" in txt.get_text():
+            txt.set_fontsize(9)
+
+    # ── Legend — placed BELOW the plot to guarantee zero overlap ──
+    from matplotlib.patches import Patch
+    red_color = "#ff0051"
+    blue_color = "#008bfb"
+    for patch in ax.patches:
+        fc = patch.get_facecolor()
+        if len(fc) >= 3:
+            if fc[0] > 0.5 and fc[2] < 0.3:
+                red_color = fc
+            elif fc[2] > 0.5 and fc[0] < 0.3:
+                blue_color = fc
+    legend_elements = [
+        Patch(facecolor=red_color, label="Increases CVD risk  (positive SHAP)"),
+        Patch(facecolor=blue_color, label="Decreases CVD risk  (negative SHAP)"),
+    ]
+    ax.legend(handles=legend_elements, loc="upper center",
+              bbox_to_anchor=(0.5, -0.10), ncol=2,
+              fontsize=8.5, frameon=True, framealpha=0.9, edgecolor="#cccccc")
+
+    # Reserve space below the plot for the legend
+    fig.subplots_adjust(bottom=0.14)
+    return fig
 
 
 # ═══════════════════════════════════════════════════════════════════════
 # Main app
 # ═══════════════════════════════════════════════════════════════════════
+
+def render_user_manual() -> None:
+    """Render the User Manual content."""
+    st.subheader("User Manual")
+
+    st.markdown("""
+    ### Welcome to Heart CDSS
+
+    This Clinical Decision Support System (CDSS) predicts cardiovascular disease (CVD) risk
+    using a machine learning model (XGBoost) trained on 68,635 patient records from the
+    Kaggle Cardiovascular Disease dataset.
+
+    ---
+
+    ### 1. Single Patient Prediction (Predict Tab)
+
+    **Step 1:** Fill in the patient's clinical data in the input form.
+
+    | Field | What to enter |
+    |---|---|
+    | Age | Patient's age in years (auto-converted to days) |
+    | Gender | 1 = Female, 2 = Male |
+    | Height | Height in centimeters |
+    | Weight | Weight in kilograms |
+    | Systolic BP | Upper blood pressure reading (mmHg) |
+    | Diastolic BP | Lower blood pressure reading (mmHg) |
+    | Cholesterol | 1 = Normal, 2 = Above Normal, 3 = Well Above Normal |
+    | Glucose | 1 = Normal, 2 = Above Normal, 3 = Well Above Normal |
+    | Smoking / Alcohol / Activity | 0 = No, 1 = Yes |
+    """)
+
+    pred_form_img = SCREENSHOTS_DIR / "01_predict_form.png"
+    if pred_form_img.exists():
+        st.markdown("**Prediction Input Form:**")
+        st.image(str(pred_form_img), width="stretch")
+
+    st.markdown("""
+    **Step 2:** Click **\"Run Prediction\"** to see the risk score.
+
+    **Step 3:** Click **\"Generate Local SHAP Explanation\"** to view a waterfall chart
+    showing exactly which factors pushed the prediction toward high or low risk.
+    """)
+
+    pred_result_img = SCREENSHOTS_DIR / "02_predict_result.png"
+    if pred_result_img.exists():
+        st.markdown("**Prediction Result with SHAP Waterfall:**")
+        st.image(str(pred_result_img), width="stretch")
+
+    st.markdown("""
+    **Interpreting the SHAP Waterfall:**
+    - **Red bars (right):** Features that increase risk
+    - **Blue bars (left):** Features that decrease risk
+    - Bar length = strength of the feature's contribution
+    - The final value is the model's log-odds prediction
+
+    ---
+
+    ### 2. Decision Threshold
+
+    Use the **slider in the sidebar** to adjust the classification threshold:
+    - **Lower threshold (e.g., 0.3):** Catch more at-risk patients (higher recall),
+      but more false alarms
+    - **Higher threshold (e.g., 0.7):** Fewer false alarms, but may miss some
+      at-risk patients
+    - **Default (0.7383):** Youden-optimal threshold — best balance of sensitivity
+      and specificity
+
+    ---
+
+    ### 3. Model Explainability (Explainability Tab)
+
+    View **global SHAP plots** that show which features drive the model across
+    all patients:
+    - **Beeswarm plot:** Each dot = one patient. Red = high feature value,
+      Blue = low. SHAP > 0 pushes toward high risk.
+    - **Bar plot:** Shows average importance of each feature across all patients.
+    """)
+
+    explain_img = SCREENSHOTS_DIR / "03_explainability.png"
+    if explain_img.exists():
+        st.markdown("**Global SHAP Explainability View:**")
+        st.image(str(explain_img), width="stretch")
+
+    st.markdown("""
+    *Run `python charts/fig_shap_cardio70k.py` before launching the app to
+    generate these plots.*
+
+    ---
+
+    ### 4. Batch Prediction (Batch Predict Tab)
+
+    **Step 1:** Prepare a CSV file with the same column names as the Cardio70k dataset.
+
+    **Step 2:** Upload the CSV and click **\"Run Batch Prediction\"**.
+
+    **Step 3:** Download results as a CSV with added columns:
+    `risk_proba` (risk probability) and `risk_label` (\"High Risk\" / \"Low Risk\").
+    """)
+
+    batch_img = SCREENSHOTS_DIR / "04_batch_predict.png"
+    if batch_img.exists():
+        st.markdown("**Batch Prediction Interface:**")
+        st.image(str(batch_img), width="stretch")
+
+    st.markdown("*Note: Maximum 5,000 rows per batch.*")
+
+
+def render_about() -> None:
+    """Render the About content."""
+    st.subheader("About This Project")
+
+    col_left, col_right = st.columns([2, 1])
+
+    with col_left:
+        st.markdown("""
+        ### Heart CDSS — Ensemble Learning for Early Heart Disease Detection
+
+        This system is part of a Master of Computer Science thesis at
+        **Universiti Kebangsaan Malaysia (UKM)**, Faculty of Information Science
+        and Technology.
+
+        **Research Objectives:**
+        1. Evaluate and compare five ML algorithms (Logistic Regression, Random
+           Forest, XGBoost, LightGBM, CatBoost) across three multi-scale clinical
+           datasets
+        2. Develop an interpretable, web-based CDSS prototype using Streamlit
+        3. Provide both global and local model interpretability through SHAP
+           visualizations
+
+        **Deployed Model:**
+        - **Algorithm:** XGBoost (best performer on Cardio70k)
+        - **Training Data:** Kaggle Cardiovascular Disease dataset (N=68,635)
+        - **Optimization:** RandomizedSearchCV with 5-fold stratified cross-validation
+        - **Threshold:** Youden-optimal (0.7383)
+        """)
+
+    with col_right:
+        st.markdown("""
+        ### Author
+        **Xu Qianzhou**
+
+        ### Supervisor
+        **Nur Fazidah Elias** *(UKM FTSM)*
+
+        ### Year
+        2026
+
+        ---
+
+        ### Tech Stack
+        - Python 3.13
+        - Streamlit
+        - XGBoost
+        - SHAP
+        - scikit-learn
+        """)
+
+    st.divider()
+    st.markdown("""
+    ### Citation
+    Xu Qianzhou. *Ensemble Learning Techniques for Early Heart Disease Detection:
+    From Algorithm to Prototype Development.* Master's Thesis,
+    Universiti Kebangsaan Malaysia (UKM), 2026.
+
+    ### Disclaimer
+    This system is a research prototype intended for **demonstration and educational
+    purposes only**. It is not a medical device and should not be used for actual
+    clinical diagnosis without proper validation and regulatory approval.
+    """)
+
+    st.info("For questions or feedback, please contact: **P158348@siswa.ukm.edu.my**")
+
 
 def main() -> None:
     st.set_page_config(page_title="Heart CDSS — Cardio70k + XGBoost", layout="wide")
@@ -287,12 +538,45 @@ def main() -> None:
         )
         st.caption(f"Default (Youden): {YOUDEW_THRESHOLD}")
 
-    # ── Title ──
-    st.title("Cardiovascular Disease Risk Assessment")
-    st.caption("Cardio70k dataset  ·  XGBoost  ·  SHAP Explainability  ·  Batch Scoring")
+    # ── Title row with top-right icon buttons ──
+    col_title, col_m, col_a = st.columns([7, 0.7, 0.7])
+    with col_title:
+        st.title("Cardiovascular Disease Risk Assessment")
+        st.caption("Cardio70k dataset  ·  XGBoost  ·  SHAP Explainability  ·  Batch Scoring")
+    with col_m:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("📖", key="ico_manual", help="User Manual"):
+            st.session_state["page"] = "manual"
+            st.rerun()
+    with col_a:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("ℹ️", key="ico_about", help="About"):
+            st.session_state["page"] = "about"
+            st.rerun()
 
-    tab_predict, tab_explain, tab_batch, tab_manual, tab_about = st.tabs([
-        "Predict", "Explainability", "Batch Predict", "User Manual", "About"
+    # ── Check if a page was requested ──
+    page = st.session_state.get("page", None)
+    if page == "manual":
+        col_back, _ = st.columns([1, 9])
+        with col_back:
+            if st.button("← Back to App", key="back_manual", width="stretch"):
+                st.session_state["page"] = None
+                st.rerun()
+        render_user_manual()
+        return
+
+    if page == "about":
+        col_back, _ = st.columns([1, 9])
+        with col_back:
+            if st.button("← Back to App", key="back_about", width="stretch"):
+                st.session_state["page"] = None
+                st.rerun()
+        render_about()
+        return
+
+    # ── Main tabs ──
+    tab_predict, tab_explain, tab_batch = st.tabs([
+        "Predict", "Explainability", "Batch Predict"
     ])
 
     # ════════════════════ Tab 1: Predict ════════════════════
@@ -316,41 +600,78 @@ def main() -> None:
 
             with st.expander("SHAP Explanation (Waterfall)", expanded=True):
                 if st.button("Generate Local SHAP Explanation", key="gen_local"):
-                    path = generate_local_shap(
+                    fig = generate_local_shap(
                         model, st.session_state["last_input"],
                         BASE / "results" / "cardio70k" / "shap_app",
                     )
-                    if path:
-                        st.session_state["shap_path"] = str(path)
+                    if fig is not None:
+                        st.session_state["shap_fig"] = fig
                         st.session_state["shap_gen"] = True
 
-                if st.session_state.get("shap_gen") and st.session_state.get("shap_path"):
-                    st.image(st.session_state["shap_path"], width="stretch")
+                if st.session_state.get("shap_gen") and st.session_state.get("shap_fig"):
+                    st.markdown("### :bar_chart: SHAP Individual Patient Risk Decomposition")
+                    st.caption(
+                        "This waterfall plot employs **SHAP (SHapley Additive "
+                        "exPlanations)** to decompose how individual clinical "
+                        "features contribute to the patient's predicted CVD risk. "
+                        "**E[f(x)]** is the cohort baseline (expected model output "
+                        "across the population). Each bar shows a feature's marginal "
+                        "contribution; their cumulative sum yields the final output "
+                        "**f(x)** — the patient's individual risk score **in log-odds "
+                        "units**. The predicted probability displayed above is obtained "
+                        "by applying the logistic (sigmoid) transform: "
+                        "$p = 1 / (1 + e^{-f(x)})$, mapping log-odds from "
+                        "$(-\\infty, +\\infty)$ to a risk probability in $[0, 1]$."
+                    )
+                    st.pyplot(st.session_state["shap_fig"])
 
     # ════════════════════ Tab 2: Explainability ════════════════════
     with tab_explain:
         st.subheader("Model Explainability")
 
+        st.markdown("### Global Explanation — Cardio70k XGBoost")
+        st.caption(
+            "These plots employ **SHAP (SHapley Additive exPlanations)** to reveal "
+            "which clinical features drive the model's CVD risk predictions across "
+            "the entire test cohort (N≈13,727). Unlike the single-patient waterfall "
+            "in the Predict tab, these global views aggregate SHAP values from all "
+            "patients to identify population-level feature importance patterns."
+        )
+
         col_a, col_b = st.columns(2)
+
         with col_a:
-            st.markdown("#### Global SHAP (Beeswarm)")
+            st.markdown("#### Beeswarm (Summary) Plot")
             beeswarm_path = CHARTS_DIR / "fig_shap_beeswarm.png"
             if beeswarm_path.exists():
                 st.image(str(beeswarm_path), width="stretch")
             else:
                 st.info("Beeswarm plot not found. Run `charts/fig_shap_cardio70k.py` first.")
+            st.caption(
+                "**How to read:** Each dot represents one patient. The horizontal "
+                "position shows the SHAP value — dots to the right of zero indicate "
+                "features pushing toward higher CVD risk; dots to the left indicate "
+                "features pushing toward lower risk. **Colour** encodes the actual "
+                "feature value: red = high, blue = low. A cluster of red dots on the "
+                "right means patients with high values of that feature tend to have "
+                "elevated risk."
+            )
 
         with col_b:
-            st.markdown("#### Global SHAP (Bar)")
+            st.markdown("#### Bar (Importance) Plot")
             bar_path = CHARTS_DIR / "fig_shap_bar.png"
             if bar_path.exists():
                 st.image(str(bar_path), width="stretch")
             else:
                 st.info("Bar plot not found.")
-
-        st.divider()
-        st.caption("Global SHAP explains which features drive the model's decisions across all patients. "
-                   "Local SHAP (in the Predict tab) explains a single patient's risk factors.")
+            st.caption(
+                "**How to read:** Bar length represents the mean absolute SHAP value "
+                "across all patients — a direct measure of each feature's average "
+                "impact on the model's output. Longer bars indicate features that "
+                "consistently influence CVD risk prediction, regardless of direction. "
+                "This is the global importance ranking; refer to the Beeswarm plot "
+                "for directional (risk-increasing vs. risk-decreasing) patterns."
+            )
 
     # ════════════════════ Tab 3: Batch Predict ════════════════════
     with tab_batch:
@@ -402,151 +723,6 @@ def main() -> None:
                 file_name="cardio70k_predictions.csv",
                 mime="text/csv",
             )
-
-
-    # ════════════════════ Tab 4: User Manual ════════════════════
-    with tab_manual:
-        st.subheader("User Manual")
-
-        st.markdown("""
-        ### Welcome to Heart CDSS
-
-        This Clinical Decision Support System (CDSS) predicts cardiovascular disease (CVD) risk
-        using a machine learning model (XGBoost) trained on 68,635 patient records from the
-        Kaggle Cardiovascular Disease dataset.
-
-        ---
-
-        ### 1. Single Patient Prediction (Predict Tab)
-
-        **Step 1:** Fill in the patient's clinical data in the input form.
-
-        | Field | What to enter |
-        |---|---|
-        | Age | Patient's age in years (auto-converted to days) |
-        | Gender | 1 = Female, 2 = Male |
-        | Height | Height in centimeters |
-        | Weight | Weight in kilograms |
-        | Systolic BP | Upper blood pressure reading (mmHg) |
-        | Diastolic BP | Lower blood pressure reading (mmHg) |
-        | Cholesterol | 1 = Normal, 2 = Above Normal, 3 = Well Above Normal |
-        | Glucose | 1 = Normal, 2 = Above Normal, 3 = Well Above Normal |
-        | Smoking / Alcohol / Activity | 0 = No, 1 = Yes |
-
-        **Step 2:** Click **\"Run Prediction\"** to see the risk score.
-
-        **Step 3:** Click **\"Generate Local SHAP Explanation\"** to view a waterfall chart
-        showing exactly which factors pushed the prediction toward high or low risk.
-
-        **Interpreting the SHAP Waterfall:**
-        - **Red bars (right):** Features that increase risk
-        - **Blue bars (left):** Features that decrease risk
-        - Bar length = strength of the feature's contribution
-        - The final value is the model's log-odds prediction
-
-        ---
-
-        ### 2. Decision Threshold
-
-        Use the **slider in the sidebar** to adjust the classification threshold:
-        - **Lower threshold (e.g., 0.3):** Catch more at-risk patients (higher recall),
-          but more false alarms
-        - **Higher threshold (e.g., 0.7):** Fewer false alarms, but may miss some
-          at-risk patients
-        - **Default (0.7383):** Youden-optimal threshold — best balance of sensitivity
-          and specificity
-
-        ---
-
-        ### 3. Model Explainability (Explainability Tab)
-
-        View **global SHAP plots** that show which features drive the model across
-        all patients:
-        - **Beeswarm plot:** Each dot = one patient. Red = high feature value,
-          Blue = low. SHAP > 0 pushes toward high risk.
-        - **Bar plot:** Shows average importance of each feature across all patients.
-
-        *Run `python charts/fig_shap_cardio70k.py` before launching the app to
-        generate these plots.*
-
-        ---
-
-        ### 4. Batch Prediction (Batch Predict Tab)
-
-        **Step 1:** Prepare a CSV file with the same column names as the Cardio70k dataset.
-
-        **Step 2:** Upload the CSV and click **\"Run Batch Prediction\"**.
-
-        **Step 3:** Download results as a CSV with added columns:
-        `risk_proba` (risk probability) and `risk_label` (\"High Risk\" / \"Low Risk\").
-
-        *Note: Maximum 5,000 rows per batch.*
-        """)
-
-    # ════════════════════ Tab 5: About ════════════════════
-    with tab_about:
-        st.subheader("About This Project")
-
-        col_left, col_right = st.columns([2, 1])
-
-        with col_left:
-            st.markdown("""
-            ### Heart CDSS — Ensemble Learning for Early Heart Disease Detection
-
-            This system is part of a Master of Computer Science thesis at
-            **Universiti Kebangsaan Malaysia (UKM)**, Faculty of Information Science
-            and Technology.
-
-            **Research Objectives:**
-            1. Evaluate and compare five ML algorithms (Logistic Regression, Random
-               Forest, XGBoost, LightGBM, CatBoost) across three multi-scale clinical
-               datasets
-            2. Develop an interpretable, web-based CDSS prototype using Streamlit
-            3. Provide both global and local model interpretability through SHAP
-               visualizations
-
-            **Deployed Model:**
-            - **Algorithm:** XGBoost (best performer on Cardio70k)
-            - **Training Data:** Kaggle Cardiovascular Disease dataset (N=68,635)
-            - **Optimization:** RandomizedSearchCV with 5-fold stratified cross-validation
-            - **Threshold:** Youden-optimal (0.7383)
-            """)
-
-        with col_right:
-            st.markdown("""
-            ### Author
-            **Xu Qianzhou**
-
-            ### Supervisor
-            *(UKM FTSM)*
-
-            ### Year
-            2026
-
-            ---
-
-            ### Tech Stack
-            - Python 3.13
-            - Streamlit
-            - XGBoost
-            - SHAP
-            - scikit-learn
-            """)
-
-        st.divider()
-        st.markdown("""
-        ### Citation
-        Xu Qianzhou. *Ensemble Learning Techniques for Early Heart Disease Detection:
-        From Algorithm to Prototype Development.* Master's Thesis,
-        Universiti Kebangsaan Malaysia (UKM), 2026.
-
-        ### Disclaimer
-        This system is a research prototype intended for **demonstration and educational
-        purposes only**. It is not a medical device and should not be used for actual
-        clinical diagnosis without proper validation and regulatory approval.
-        """)
-
-        st.info("For questions or feedback, please contact the author through UKM FTSM.")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,33 @@
+{
+  "dataset": "uci_cleveland",
+  "csv_path": "D:\\P2\\heart-cdss-algorithm\\datasets\\heart_disease_uci.csv",
+  "target": "num",
+  "run_id": "20260524_190227",
+  "model": "rf",
+  "best_params": {
+    "n_estimators": 900,
+    "min_samples_split": 5,
+    "min_samples_leaf": 2,
+    "max_features": "log2",
+    "max_depth": 12
+  },
+  "row": {
+    "run_id": "20260524_190227",
+    "dataset": "uci_cleveland",
+    "model": "rf",
+    "cv_roc_auc": 0.8910619020015671,
+    "test_accuracy": 0.9016393442622952,
+    "test_precision": 0.84375,
+    "test_recall": 0.9642857142857144,
+    "test_f1": 0.9,
+    "test_roc_auc": 0.9588744588744588,
+    "test_pr_auc": 0.9403266883328458,
+    "test_optimal_threshold": 0.479,
+    "n_train": 243,
+    "n_test": 61,
+    "cv_folds": 5,
+    "n_iter": 25,
+    "shap": false,
+    "training_time_s": 20.33
+  }
+}

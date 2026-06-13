@@ -1,0 +1,32 @@
+{
+  "dataset": "cardio70k",
+  "csv_path": "D:\\P2\\heart-cdss-algorithm\\datasets\\cardio_train.csv",
+  "target": "cardio",
+  "run_id": "20260524_191726",
+  "model": "cat",
+  "best_params": {
+    "learning_rate": 0.01,
+    "l2_leaf_reg": 10,
+    "iterations": 1000,
+    "depth": 6
+  },
+  "row": {
+    "run_id": "20260524_191726",
+    "dataset": "cardio70k",
+    "model": "cat",
+    "cv_roc_auc": 0.7803918429724838,
+    "test_accuracy": 0.7391272674291542,
+    "test_precision": 0.7697865904889934,
+    "test_recall": 0.674469964664311,
+    "test_f1": 0.7189829710429255,
+    "test_roc_auc": 0.8095933402289304,
+    "test_pr_auc": 0.7923654445217412,
+    "test_optimal_threshold": 0.5166,
+    "n_train": 54908,
+    "n_test": 13727,
+    "cv_folds": 5,
+    "n_iter": 25,
+    "shap": false,
+    "training_time_s": 826.42
+  }
+}

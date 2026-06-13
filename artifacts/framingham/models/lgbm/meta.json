@@ -1,0 +1,35 @@
+{
+  "dataset": "framingham",
+  "csv_path": "D:\\P2\\heart-cdss-algorithm\\datasets\\framingham.csv",
+  "target": "TenYearCHD",
+  "run_id": "20260531_174145",
+  "model": "lgbm",
+  "best_params": {
+    "subsample": 1.0,
+    "reg_lambda": 2.0,
+    "num_leaves": 31,
+    "n_estimators": 500,
+    "min_child_samples": 10,
+    "learning_rate": 0.01,
+    "colsample_bytree": 1.0
+  },
+  "row": {
+    "run_id": "20260531_174145",
+    "dataset": "framingham",
+    "model": "lgbm",
+    "cv_pr_auc": 0.321395491644888,
+    "test_accuracy": 0.7193396226415094,
+    "test_precision": 0.2367149758454106,
+    "test_recall": 0.3798449612403101,
+    "test_f1": 0.2916666666666667,
+    "test_roc_auc": 0.6315834869704909,
+    "test_pr_auc": 0.2288311790592972,
+    "test_optimal_threshold": 0.512,
+    "n_train": 3392,
+    "n_test": 848,
+    "cv_folds": 5,
+    "n_iter": 25,
+    "shap": true,
+    "training_time_s": 87.27
+  }
+}

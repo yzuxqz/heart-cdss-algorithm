@@ -295,6 +295,27 @@ def generate_shap_outputs(
         plt.figure()
         shap.plots.waterfall(explanation[local_index], show=False, max_display=30)
         fig = plt.gcf()
+        ax = plt.gca()
+
+        # ── Academic styling: add legend, clean x-axis ──
+        from matplotlib.patches import Patch
+        red_color = "#ff0051"
+        blue_color = "#008bfb"
+        for patch in ax.patches:
+            fc = patch.get_facecolor()
+            if len(fc) >= 3:
+                if fc[0] > 0.5 and fc[2] < 0.3:
+                    red_color = fc
+                elif fc[2] > 0.5 and fc[0] < 0.3:
+                    blue_color = fc
+        legend_elements = [
+            Patch(facecolor=red_color, label="Increases risk  (positive SHAP)"),
+            Patch(facecolor=blue_color, label="Decreases risk  (negative SHAP)"),
+        ]
+        ax.legend(handles=legend_elements, loc="lower right", fontsize=9,
+                  frameon=True, framealpha=0.9, edgecolor="#cccccc")
+        ax.set_xlabel("")
+
         try:
             proba = None
             if hasattr(pipeline, "predict_proba"):
@@ -309,26 +330,26 @@ def generate_shap_outputs(
             top_k=10,
         )
         body = [
-            "阅读指南（Waterfall）：从基线(base value)出发，逐项叠加每个特征的 SHAP 贡献，得到最终输出。",
-            "红色(正贡献)把预测推向高风险；蓝色(负贡献)把预测拉向低风险。",
+            "Reading guide (Waterfall): Starting from the base value (expected output), each feature's SHAP contribution is added sequentially.",
+            "Red (positive SHAP) pushes prediction toward higher CVD risk; Blue (negative SHAP) pushes toward lower CVD risk.",
         ]
         if proba is not None:
-            body.append(f"该样本预测风险概率：{_format_float(proba)}（模型输出可能与 SHAP 计算单位不同，仅做参考）")
+            body.append(f"Predicted CVD risk probability for this sample: {_format_float(proba)} (model output may differ in scale from SHAP units)")
         body.append("")
-        body.append("主要正向驱动（推高风险）：")
+        body.append("Top positive drivers (push toward higher risk):")
         if pos:
             for name, xv, sv in pos[:6]:
-                body.append(f"- {name}: value={_format_float(xv)}；SHAP={_format_float(sv)}")
+                body.append(f"- {name}: value={_format_float(xv)}; SHAP={_format_float(sv)}")
         else:
-            body.append("- 无明显正向驱动项（或已被截断）")
-        body.append("主要负向抑制（降低风险）：")
+            body.append("- No significant positive drivers (or truncated)")
+        body.append("Top negative suppressors (push toward lower risk):")
         if neg:
             for name, xv, sv in neg[:6]:
-                body.append(f"- {name}: value={_format_float(xv)}；SHAP={_format_float(sv)}")
+                body.append(f"- {name}: value={_format_float(xv)}; SHAP={_format_float(sv)}")
         else:
-            body.append("- 无明显负向抑制项（或已被截断）")
+            body.append("- No significant negative suppressors (or truncated)")
         footer = [
-            "提示：若出现 one-hot 特征（如 xxx=1），说明该类别取值对预测有显著影响。",
+            "Note: One-hot encoded features (e.g., xxx=1) indicate that a specific categorical value has a notable impact.",
         ]
         _attach_explanation_panel(
             fig=fig,

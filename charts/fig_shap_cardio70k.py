@@ -1,5 +1,10 @@
 """
 Figure 4.X — SHAP global explanation for Cardio70k XGBoost model.
+
+Generates two publication-quality figures for the Explainability tab:
+  1. Beeswarm (summary)  — per-patient SHAP distribution + feature-value colour coding
+  2. Bar (importance)    — mean |SHAP| ranking
+Output: charts/global/fig_shap_beeswarm.png  +  charts/global/fig_shap_bar.png
 """
 
 from __future__ import annotations
@@ -14,8 +19,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import shap
+from matplotlib.patches import Patch
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
@@ -27,27 +32,26 @@ from heart_cdss.preprocess import build_preprocessor
 CHARTS_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = CHARTS_DIR.parent
 RESULTS_DIR = PROJECT_DIR / "results" / "cardio70k"
+OUT_DIR = CHARTS_DIR / "global"
+SEED = 42
 
-FONT_LABEL = 11
-FONT_TITLE = 13
-
-# ── Clinical feature name mapping ──
-FEATURE_NAMES_CN: dict[str, str] = {
-    "age": "Age (days)",
-    "gender": "Gender",
-    "height": "Height (cm)",
-    "weight": "Weight (kg)",
-    "ap_hi": "Systolic BP",
-    "ap_lo": "Diastolic BP",
-    "cholesterol": "Cholesterol",
-    "gluc": "Glucose",
-    "smoke": "Smoking",
-    "alco": "Alcohol",
-    "active": "Physical Activity",
-    "bmi": "BMI",
-    "age_years": "Age (years)",
-    "pulse_pressure": "Pulse Pressure",
-    "map": "MAP",
+# ── Clinical feature-name mapping  (same as app.py waterfall) ──
+CLINICAL_NAMES: dict[str, str] = {
+    "age":           "Age (Years)",
+    "gender":        "Gender",
+    "height":        "Height (cm)",
+    "weight":        "Weight (kg)",
+    "ap_hi":         "Systolic Blood Pressure (mmHg)",
+    "ap_lo":         "Diastolic Blood Pressure (mmHg)",
+    "cholesterol":   "Cholesterol Level",
+    "gluc":          "Glucose Level",
+    "smoke":         "Smoking Status",
+    "alco":          "Alcohol Intake",
+    "active":        "Physical Activity",
+    "bmi":           "BMI",
+    "age_years":     "Age (Years)",
+    "pulse_pressure":"Pulse Pressure",
+    "map":           "Mean Arterial Pressure",
 }
 
 
@@ -60,36 +64,34 @@ def _load_best_xgb_params() -> dict[str, float]:
 
 
 def _safe_name(col: str) -> str:
-    """Map one-hot encoded feature names back to readable clinical labels."""
-    # sklearn ColumnTransformer format: "num__age" or "cat__cholesterol_1"
+    """Map one-hot encoded feature names to clinical labels."""
     if "__" in col:
         _, feature_val = col.split("__", 1)
     else:
         feature_val = col
 
-    # One-hot: feature_val like "cholesterol_1" → "Cholesterol=1"
     parts = feature_val.rsplit("_", 1)
-    if len(parts) == 2 and parts[1].isdigit() and parts[0] in FEATURE_NAMES_CN:
-        label = FEATURE_NAMES_CN[parts[0]]
+    if len(parts) == 2 and parts[1].isdigit() and parts[0] in CLINICAL_NAMES:
+        label = CLINICAL_NAMES[parts[0]]
         return f"{label}={parts[1]}"
 
-    return FEATURE_NAMES_CN.get(feature_val, feature_val)
+    return CLINICAL_NAMES.get(feature_val, feature_val)
 
 
 def main() -> None:
-    seed = 42
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # ── Load & prepare data ──
     df = read_csv_auto(PROJECT_DIR / "datasets" / "cardio_train.csv")
     X, y = prepare_dataset(df, "cardio70k", "cardio")
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=seed, stratify=y,
+        X, y, test_size=0.2, random_state=SEED, stratify=y,
     )
 
     # ── Build pipeline with best XGBoost params ──
     preprocessor = build_preprocessor(X_train)
     best_params = _load_best_xgb_params()
-    base_models = get_models_and_spaces(seed)
+    base_models = get_models_and_spaces(SEED)
     model = base_models["xgb"][0]
     pipe_params = {f"model__{k}": v for k, v in best_params.items()}
     pipe = Pipeline([("preprocess", preprocessor), ("model", model)])
@@ -108,24 +110,42 @@ def main() -> None:
     if isinstance(shap_values, list):
         shap_values = shap_values[1] if len(shap_values) > 1 else shap_values[0]
 
-    # ── Figure 1: Summary beeswarm plot ──
-    fig, ax = plt.subplots(figsize=(10, 7))
+    # ═══════════════════════════════════════════════════════════════
+    # Figure 1 — Beeswarm (summary) plot
+    # ═══════════════════════════════════════════════════════════════
+    fig, ax = plt.subplots(figsize=(12, 7))
     shap.summary_plot(
         shap_values, X_test_transformed,
         feature_names=feature_names,
         max_display=12,
         show=False,
     )
-    ax.set_xlabel("SHAP value (impact on model output)", fontsize=FONT_LABEL)
-    ax.set_title("SHAP Feature Importance — Cardio70k XGBoost", fontsize=FONT_TITLE, fontweight="bold")
+
+    ax.set_xlabel("")                                             # removed default label
+    ax.set_title("Feature Impact Distribution — Cardio70k XGBoost",
+                 fontsize=14, fontweight="bold", pad=12)
+
+    # Legend explaining the built-in colour bar
+    legend_elements = [
+        Patch(facecolor="#ec2e4a", label="High feature value"),
+        Patch(facecolor="#7d7dff", label="Low feature value"),
+    ]
+    ax.legend(handles=legend_elements, loc="lower right",
+              fontsize=8.5, frameon=True, framealpha=0.9,
+              edgecolor="#cccccc", title="Feature Value",
+              title_fontsize=9)
+
     fig.tight_layout()
-    out_beeswarm = CHARTS_DIR / "cardio70k" / "fig_shap_beeswarm.png"
-    fig.savefig(out_beeswarm, dpi=300, bbox_inches="tight", facecolor="white", edgecolor="none")
+    out_beeswarm = OUT_DIR / "fig_shap_beeswarm.png"
+    fig.savefig(out_beeswarm, dpi=300, bbox_inches="tight",
+                facecolor="white", edgecolor="none")
     plt.close(fig)
     print(f"Saved: {out_beeswarm}")
 
-    # ── Figure 2: Mean |SHAP| bar plot ──
-    fig, ax = plt.subplots(figsize=(8, 6))
+    # ═══════════════════════════════════════════════════════════════
+    # Figure 2 — Mean |SHAP| bar plot
+    # ═══════════════════════════════════════════════════════════════
+    fig, ax = plt.subplots(figsize=(10, 7))
     shap.summary_plot(
         shap_values, X_test_transformed,
         feature_names=feature_names,
@@ -133,23 +153,27 @@ def main() -> None:
         plot_type="bar",
         show=False,
     )
-    ax.set_xlabel("Mean |SHAP value|", fontsize=FONT_LABEL)
-    ax.set_title("Mean SHAP Importance — Cardio70k XGBoost", fontsize=FONT_TITLE, fontweight="bold")
+
+    ax.set_xlabel("Mean (|SHAP value|)", fontsize=11)
+    ax.set_title("Feature Importance Ranking — Cardio70k XGBoost",
+                 fontsize=14, fontweight="bold", pad=12)
+
     fig.tight_layout()
-    out_bar = CHARTS_DIR / "cardio70k" / "fig_shap_bar.png"
-    fig.savefig(out_bar, dpi=300, bbox_inches="tight", facecolor="white", edgecolor="none")
+    out_bar = OUT_DIR / "fig_shap_bar.png"
+    fig.savefig(out_bar, dpi=300, bbox_inches="tight",
+                facecolor="white", edgecolor="none")
     plt.close(fig)
     print(f"Saved: {out_bar}")
 
-    # ── Console: top-10 SHAP importance ──
+    # ── Console: top-12 SHAP importance ──
     mean_shap = np.abs(shap_values).mean(axis=0)
     order = np.argsort(mean_shap)[::-1]
     print("\nTop-12 SHAP feature importance:")
-    print(f"{'Feature':<35} {'Mean|SHAP|':>12}")
+    print(f"{'Feature':<45} {'Mean|SHAP|':>12}")
     for idx in order[:12]:
-        print(f"{feature_names[idx]:<35} {mean_shap[idx]:>12.6f}")
+        print(f"{feature_names[idx]:<45} {mean_shap[idx]:>12.6f}")
 
-    print("\nDone.")
+    print("\nDone. Output directory:", OUT_DIR)
 
 
 if __name__ == "__main__":

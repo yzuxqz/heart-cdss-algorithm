@@ -171,8 +171,27 @@ def main() -> None:
         fig, ax = plt.subplots(figsize=(10, 7))
         shap.plots.waterfall(exp, max_display=10, show=False)
 
-        # Beautify
-        ax.set_xlabel("SHAP value (impact on log-odds of CVD)", fontsize=11)
+        # ── Academic styling: remove SHAP x-label, add legend ──
+        ax.set_xlabel("")
+
+        # Extract bar colors for accurate legend
+        from matplotlib.patches import Patch
+        red_color = "#ff0051"
+        blue_color = "#008bfb"
+        for patch in ax.patches:
+            fc = patch.get_facecolor()
+            if len(fc) >= 3:
+                if fc[0] > 0.5 and fc[2] < 0.3:
+                    red_color = fc
+                elif fc[2] > 0.5 and fc[0] < 0.3:
+                    blue_color = fc
+        legend_elements = [
+            Patch(facecolor=red_color, label="Increases CVD risk  (positive SHAP)"),
+            Patch(facecolor=blue_color, label="Decreases CVD risk  (negative SHAP)"),
+        ]
+        ax.legend(handles=legend_elements, loc="lower right", fontsize=9,
+                  frameon=True, framealpha=0.9, edgecolor="#cccccc")
+
         ax.set_title(title, fontsize=14, fontweight="bold", pad=12)
 
         # Add clinical narrative text box

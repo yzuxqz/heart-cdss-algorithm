@@ -39,3 +39,6 @@ catboost_info/
 .vscode/
 .idea/
 .DS_Store
+
+# Large model files (GitHub 100MB limit)
+artifacts/cardio70k/models/rf/model.joblib
